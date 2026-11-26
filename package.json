@@ -8,7 +8,8 @@
     "content": "node scripts/build-content.mjs",
     "build": "npm run content && tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "workshop": "node tools/workshop/server.mjs"
   },
   "devDependencies": {
     "typescript": "^5.6.0",

@@ -10,6 +10,18 @@ npm run dev      # the game, live-reloading as you edit /content
 npm test         # checks the game rules AND your content files
 ```
 
+## Card Workshop (drop pictures, edit cards, publish)
+
+Double-click **Card Workshop.cmd** (or run `npm run workshop`). It opens in your browser:
+
+- Your cards appear as a gallery. Click one to edit it.
+- **Drop a picture** onto a card (or anywhere on the page). It is converted to a proper PNG and saved into `content/art`.
+  A file named like a card (for example `hsty.png`) finds its card by itself.
+- Press **Publish**: it commits and pushes with your own git login, then watches the build until the game is live.
+
+Keep the black window open while you work; close it to stop. The link it opens only works on your computer and
+changes every time. It can only touch the `content` folder and run a short list of git commands.
+
 ## Edit the game's content
 
 Cards, art and settings live in `content/` - see [content/README.md](content/README.md). No code needed.

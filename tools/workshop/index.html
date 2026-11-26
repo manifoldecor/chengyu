@@ -1,0 +1,765 @@
+<title>Card Workshop</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Ma+Shan+Zheng&display=swap">
+<style>
+  /* Layout: a gallery of your cards with an editing drawer that slides in from the right and one Publish button in the top bar.
+     Palette: ink and rice paper, one vermilion seal colour for the primary action. Rarity colours only ever mark rarity. */
+  :root {
+    --bg:#eceee9; --surface:#f8f9f6; --surface2:#e1e5dd; --line:#c9cfc3; --fg:#1d211e; --muted:#59635b;
+    --accent:#b3261e; --accent-fg:#ffffff; --ok:#1d7a44; --warn:#8f5700; --bad:#b3261e; --focus:#1a5fb4; --shadow:rgba(20,30,25,.18);
+    --ui:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --brush:"Ma Shan Zheng","KaiTi","Kaiti SC","STKaiti",serif;
+    --hanzi:"KaiTi","Kaiti SC","STKaiti","Noto Serif SC","Microsoft YaHei",serif;
+    --c-common:#a99868; --c-uncommon:#3f9f4a; --c-rare:#2f7fd6; --c-epic:#8f4fd8; --c-legendary:#d98a00;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg:#14100f; --surface:#1e1816; --surface2:#2a201d; --line:#3d302b; --fg:#f1e8d4; --muted:#ab9d8c; --shadow:rgba(0,0,0,.5);
+    --accent:#e5604a; --accent-fg:#1a0d0a; --ok:#6fcf8e; --warn:#e8b04a; --bad:#ff8f7c; --focus:#8ab8ff;
+    --c-common:#d8c8a0; --c-uncommon:#5fd068; --c-rare:#4aa3ff; --c-epic:#b872ff; --c-legendary:#ffb62e; color-scheme: dark; } }
+  :root[data-theme="dark"] {
+    --bg:#14100f; --surface:#1e1816; --surface2:#2a201d; --line:#3d302b; --fg:#f1e8d4; --muted:#ab9d8c; --shadow:rgba(0,0,0,.5);
+    --accent:#e5604a; --accent-fg:#1a0d0a; --ok:#6fcf8e; --warn:#e8b04a; --bad:#ff8f7c; --focus:#8ab8ff;
+    --c-common:#d8c8a0; --c-uncommon:#5fd068; --c-rare:#4aa3ff; --c-epic:#b872ff; --c-legendary:#ffb62e; color-scheme: dark; }
+
+  * { box-sizing:border-box; }
+  [hidden] { display:none !important; }
+  body { background:var(--bg); color:var(--fg); font:14px/1.5 var(--ui); padding-block:0 60px;
+    padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+  h1,h2,h3,p { margin:0; }
+  button,input,textarea,select { font:inherit; color:inherit; }
+  :focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
+  .wrap { max-width:1180px; margin:0 auto; transition:padding .2s; }
+  @media (min-width:1100px) { body.drawer-open .wrap { padding-right:470px; } }
+
+  .bar { display:flex; align-items:center; gap:14px; padding-block:14px; flex-wrap:wrap; position:sticky; top:env(safe-area-inset-top, 0px); background:var(--bg); z-index:5; border-bottom:1px solid var(--line); }
+  body::before { content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px); background:var(--bg); z-index:10; }
+  .brand { display:flex; align-items:baseline; gap:10px; margin-right:auto; }
+  .brand .cn { font-family:var(--brush); font-size:28px; color:var(--accent); line-height:1; }
+  .brand b { font-size:18px; font-weight:600; letter-spacing:-.01em; }
+  .folder { display:inline-flex; align-items:center; gap:8px; color:var(--muted); font-size:13px; }
+  .folder .dot { width:8px; height:8px; border-radius:50%; background:var(--ok); }
+  .folder .dot.off { background:var(--warn); }
+  .linkish { background:none; border:0; padding:0; color:var(--muted); text-decoration:underline; cursor:pointer; font-size:13px; }
+
+  .btn { appearance:none; border:1px solid var(--line); background:var(--surface); border-radius:9px; padding:8px 14px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:7px; font-weight:500; line-height:1.2; }
+  .btn:hover { background:var(--surface2); }
+  .btn.primary { background:var(--accent); border-color:var(--accent); color:var(--accent-fg); font-weight:600; }
+  .btn.primary:hover { filter:brightness(1.08); }
+  .btn.small { padding:5px 10px; font-size:12.5px; } .btn.danger { color:var(--bad); }
+  .btn[aria-disabled="true"], .btn:disabled { opacity:.45; pointer-events:none; }
+  .count { background:var(--accent-fg); color:var(--accent); border-radius:999px; font-size:12px; padding:0 7px; font-weight:700; }
+
+  .toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; padding-block:16px 6px; }
+  .search { flex:1 1 220px; min-width:0; border:1px solid var(--line); background:var(--surface); border-radius:9px; padding:8px 12px; }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; }
+  .chip { border:1px solid var(--line); background:transparent; border-radius:999px; padding:4px 11px; font-size:12.5px; cursor:pointer; display:inline-flex; gap:6px; align-items:center; }
+  .chip[aria-pressed="true"] { background:var(--fg); color:var(--bg); border-color:var(--fg); }
+  .dot { width:8px; height:8px; border-radius:50%; background:var(--dot, var(--muted)); display:inline-block; flex:none; }
+  .hint { color:var(--muted); font-size:12.5px; }
+
+  /* gallery of cards */
+  .gallery { display:grid; grid-template-columns:repeat(auto-fill, minmax(164px, 1fr)); gap:14px; padding-block:12px 0; }
+  .tile { --c:#d8c8a0; appearance:none; text-align:center; cursor:pointer; border:2px solid var(--c); border-radius:14px; padding:8px 8px 10px; position:relative;
+    background:linear-gradient(165deg,#2a201c,#120d0c); color:#f3e9d2; display:grid; gap:7px; transition:transform .12s, box-shadow .12s; }
+  .tile:hover { transform:translateY(-3px); box-shadow:0 10px 26px -10px var(--c); }
+  .tile[aria-current="true"] { box-shadow:0 0 0 3px var(--bg), 0 0 0 5px var(--c); }
+  .tile.drop { transform:scale(1.03); box-shadow:0 0 0 3px var(--bg), 0 0 0 6px var(--accent); }
+  .tile .pic { aspect-ratio:652/520; border-radius:9px; overflow:hidden; display:grid; place-items:center; font-size:56px; line-height:1;
+    background:radial-gradient(circle at 50% 55%, color-mix(in srgb,var(--c) 55%,transparent), #0a0706 70%); }
+  .tile .pic img { width:100%; height:100%; object-fit:cover; display:block; }
+  .tile .hz { font-family:var(--hanzi); font-size:21px; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tile .nm { font-size:11.5px; opacity:.7; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tile .flag { position:absolute; top:12px; right:12px; font-size:10.5px; font-weight:700; letter-spacing:.03em; padding:2px 7px; border-radius:999px; background:var(--accent); color:var(--accent-fg); }
+  .tile .flag.warn { background:var(--warn); color:#1a0d0a; }
+  .tile.add { background:transparent; border:2px dashed var(--line); color:var(--muted); min-height:150px; align-content:center; font-weight:500; }
+  .tile.add:hover { color:var(--fg); border-color:var(--fg); box-shadow:none; }
+  .empty { color:var(--muted); padding:30px 4px; }
+
+  /* drawer */
+  .drawer { position:fixed; top:0; bottom:0; right:0; width:min(450px,100vw); background:var(--surface); border-left:1px solid var(--line); box-shadow:-12px 0 40px -18px var(--shadow);
+    transform:translateX(105%); transition:transform .22s ease; z-index:20; display:flex; flex-direction:column; padding-top:env(safe-area-inset-top, 0px); }
+  body.drawer-open .drawer { transform:none; }
+  .drawer .head { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--line); gap:8px; }
+  .drawer .head h2 { font-size:15px; font-weight:600; }
+  .drawer .body { overflow:auto; padding:16px; display:grid; gap:18px; flex:1; align-content:start; padding-bottom:calc(24px + env(safe-area-inset-bottom, 0px)); }
+  .x { border:0; background:transparent; font-size:20px; width:34px; height:34px; border-radius:8px; cursor:pointer; } .x:hover { background:var(--surface2); }
+  .savestate { font-size:12.5px; color:var(--muted); display:flex; align-items:center; gap:6px; }
+  .savestate.ok { color:var(--ok); } .savestate.bad { color:var(--warn); }
+  .cardwrap { container-type:inline-size; width:100%; max-width:230px; margin-inline:auto; }
+  .card { --c:#d8c8a0; width:100%; aspect-ratio:2/3; border-radius:7cqw; border:1cqw solid var(--c);
+    background:linear-gradient(165deg,#2a201c,#120d0c); color:#f3e9d2; padding:6cqw 6cqw 5cqw; display:flex; flex-direction:column; align-items:center; gap:2.4cqw;
+    box-shadow:0 0 6cqw -1cqw var(--c), 0 10px 30px rgba(0,0,0,.25); overflow:hidden; text-align:center; }
+  .card .nm { font-weight:600; font-size:5cqw; min-height:6cqw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+  .card .art { width:100%; aspect-ratio:652/520; flex:none; border-radius:4.5cqw; border:.7cqw solid var(--c); display:grid; place-items:center; overflow:hidden; font-size:34cqw; line-height:1;
+    background:radial-gradient(circle at 50% 55%, color-mix(in srgb,var(--c) 60%,transparent), color-mix(in srgb,var(--c) 14%,#0a0706) 55%, #0a0706); }
+  .card .art img { width:100%; height:100%; object-fit:cover; }
+  .card .st { color:var(--c); font-size:4.4cqw; letter-spacing:.2em; }
+  .card .hz { font-family:var(--hanzi); font-size:min(14cqw, calc(62cqw / var(--n,4))); white-space:nowrap; text-shadow:0 0 5cqw var(--c); line-height:1.1; }
+  .card .py { color:var(--c); font-style:italic; font-size:4.6cqw; }
+  .card .mn { font-size:4.1cqw; color:#e6dcc4; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .card .ph { opacity:.4; }
+
+  .drop-zone { border:2px dashed var(--line); border-radius:12px; padding:14px; display:grid; gap:10px; justify-items:center; text-align:center; background:var(--bg); cursor:pointer; }
+  .drop-zone:hover, .drop-zone.over { border-color:var(--accent); }
+  .drop-zone b { font-weight:600; }
+  .drop-zone .meta { display:flex; align-items:center; gap:12px; text-align:left; }
+  .drop-zone img { width:72px; height:58px; object-fit:cover; border-radius:7px; }
+  .fix { border:1px solid var(--warn); color:var(--warn); border-radius:9px; padding:8px 10px; font-size:12.5px; display:grid; gap:6px; }
+
+  .field { display:grid; gap:5px; min-width:0; }
+  .field label, .field .lab { font-weight:600; font-size:13px; }
+  .in { width:100%; border:1px solid var(--line); background:var(--bg); border-radius:9px; padding:9px 11px; min-width:0; }
+  .in.hz { font-family:var(--hanzi); font-size:22px; padding:6px 11px; }
+  textarea.in { min-height:76px; resize:vertical; }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .seg { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; }
+  .seg button { border:1px solid var(--line); background:var(--bg); border-radius:9px; padding:8px 2px; cursor:pointer; font-size:12px; font-weight:500; display:grid; gap:4px; justify-items:center; }
+  .seg button[aria-pressed="true"] { border-color:var(--dot); box-shadow:inset 0 0 0 1px var(--dot); background:var(--surface2); font-weight:600; }
+  .emojis { display:flex; flex-wrap:wrap; gap:3px; }
+  .emojis button { border:1px solid transparent; background:var(--bg); border-radius:8px; width:34px; height:34px; font-size:19px; cursor:pointer; } .emojis button:hover { border-color:var(--line); }
+  .check { display:flex; gap:8px; align-items:flex-start; } .check input { margin-top:3px; }
+  details.more > summary { cursor:pointer; font-weight:600; font-size:13px; padding:4px 0; }
+  details.more[open] > summary { margin-bottom:10px; }
+  .msgs { margin:0; padding:0; list-style:none; display:grid; gap:4px; font-size:12.5px; }
+  .msgs li { padding-left:16px; position:relative; } .msgs li::before { content:"!"; position:absolute; left:2px; font-weight:700; }
+  .msgs.bad { color:var(--bad); } .msgs.warn { color:var(--warn); }
+  .btnrow { display:flex; gap:8px; flex-wrap:wrap; }
+
+  /* publish sheet + setup */
+  .scrim { position:fixed; inset:0; background:rgba(10,8,7,.55); z-index:30; display:grid; place-items:center; padding:16px; }
+  .sheet { background:var(--surface); border:1px solid var(--line); border-radius:16px; width:min(560px,100%); max-height:min(88vh,100%); overflow:auto; padding:20px; display:grid; gap:14px; box-shadow:0 30px 80px -20px var(--shadow); }
+  .sheet h2 { font-size:18px; font-weight:600; }
+  .changes { margin:0; padding:0; list-style:none; display:grid; gap:6px; }
+  .changes li { display:flex; gap:10px; align-items:baseline; justify-content:space-between; border-bottom:1px solid var(--line); padding-bottom:6px; }
+  .changes .hz { font-family:var(--hanzi); font-size:18px; } .changes .what { color:var(--muted); font-size:12.5px; text-align:right; }
+  ol.steps { margin:0; padding:0; list-style:none; display:grid; gap:10px; }
+  ol.steps li { display:flex; gap:10px; align-items:flex-start; }
+  ol.steps .ic { width:22px; height:22px; border-radius:50%; flex:none; display:grid; place-items:center; font-size:12px; font-weight:700; background:var(--surface2); }
+  ol.steps li.run .ic { border:2px solid var(--accent); border-top-color:transparent; background:transparent; animation:spin .8s linear infinite; }
+  ol.steps li.ok .ic { background:var(--ok); color:var(--bg); } ol.steps li.bad .ic { background:var(--bad); color:var(--bg); }
+  ol.steps .sub { color:var(--muted); font-size:12.5px; } pre.log { margin:6px 0 0; font:12px/1.45 ui-monospace,Menlo,Consolas,monospace; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:8px; white-space:pre-wrap; word-break:break-word; max-height:160px; overflow:auto; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .center { max-width:520px; margin:12vh auto 0; display:grid; gap:14px; text-align:center; justify-items:center; }
+  .center h1 { font-size:22px; font-weight:600; } .center p { color:var(--muted); }
+  .veil { position:fixed; inset:12px; z-index:40; border:2px dashed var(--accent); border-radius:18px; display:none; place-items:center; background:color-mix(in srgb, var(--bg) 86%, transparent); font-weight:600; font-size:18px; pointer-events:none; }
+  body.dropping .veil { display:grid; }
+  .toast { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(18px + env(safe-area-inset-bottom, 0px)); background:var(--fg); color:var(--bg); padding:9px 16px; border-radius:999px; font-size:13px; font-weight:500;
+    opacity:0; pointer-events:none; transition:opacity .2s; z-index:60; max-width:92vw; text-align:center; }
+  .toast.on { opacity:1; }
+  @media (max-width:720px) { .two { grid-template-columns:minmax(0,1fr); } .seg { grid-template-columns:repeat(3,minmax(0,1fr)); } .gallery { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); } }
+  @media (prefers-reduced-motion: reduce) { .drawer, .toast, .tile, .wrap { transition:none; } ol.steps li.run .ic { animation:none; } }
+</style>
+
+<script type="application/json" id="claude-artifacts-manifest">{"permissions":["full-access"]}</script>
+
+<div class="wrap">
+  <header class="bar">
+    <div class="brand"><span class="cn" aria-hidden="true">卡坊</span><b>Card Workshop</b></div>
+    <span class="folder" id="folder" hidden></span>
+    <button class="btn primary" id="publish" type="button" hidden>Publish</button>
+  </header>
+  <main id="main"></main>
+</div>
+
+<aside class="drawer" id="drawer" aria-label="Edit card" aria-hidden="true"></aside>
+<div id="sheet"></div>
+<div class="veil" aria-hidden="true">Drop pictures to add them to your cards</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script type="application/json" id="seed">[]</script>
+<script>
+(function () {
+  'use strict';
+  /* ================= shared helpers ================= */
+  var RAR = [
+    { k: 'common', n: 'Common', h: 'Everyday phrases nearly everyone knows' },
+    { k: 'uncommon', n: 'Uncommon', h: 'Familiar, with a little story behind it' },
+    { k: 'rare', n: 'Rare', h: 'Literary or less common phrases' },
+    { k: 'epic', n: 'Epic', h: 'Classical references that are harder to recall' },
+    { k: 'legendary', n: 'Legendary', h: 'The most demanding phrases' }
+  ];
+  var RC = { common: '#d8c8a0', uncommon: '#5fd068', rare: '#4aa3ff', epic: '#b872ff', legendary: '#ffb62e' };
+  var MONSTERS = ['🐉','🐲','🐍','🐯','🦊','🐢','🐸','🐇','🐴','🐂','🦅','🐟','🦁','🐘','🐺','🦄','👹','👻','🦇','🕷️','🐙','🦉','🐻','🦌'];
+  var MAX_SIDE = 1400;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var clone = function (o) { return JSON.parse(JSON.stringify(o)); };
+  var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+  var uidN = 0, uid = function () { return 'c' + (++uidN) + Date.now().toString(36); };
+  var toastT = 0;
+  function say(msg) { var t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 3200); }
+
+  function blank() { return { id: '', text: '', pinyin: '', meaning: '', rarity: 'common', monster: '👾', name: '', tags: '', price: '', exclusive: false, story: '' }; }
+  function snap(c) { var o = {}; Object.keys(blank()).forEach(function (k) { o[k] = c[k]; }); return o; }
+  function tagList(s) { return String(s).split(/[,，、]/).map(function (t) { return t.trim().toLowerCase(); }).filter(Boolean); }
+  function toMd(c) {
+    var L = [], add = function (k, v) { v = String(v == null ? '' : v).trim().replace(/\s*\n\s*/g, ' '); if (v) L.push(k + ': ' + v); };
+    if (c.file && c.id && c.file !== c.id) add('id', c.id);
+    add('text', c.text); add('pinyin', c.pinyin); add('meaning', c.meaning); add('rarity', c.rarity); add('monster', c.monster); add('name', c.name);
+    var tg = tagList(c.tags); if (tg.length) L.push('tags: ' + tg.join(', '));
+    if (String(c.price).trim()) L.push('price: ' + String(c.price).trim());
+    if (c.exclusive) L.push('exclusive: yes');
+    var out = L.join('\n') + '\n';
+    if (String(c.story).trim()) out += '\n' + String(c.story).trim() + '\n';
+    return out;
+  }
+  function parseMd(raw) {
+    var lines = raw.replace(/^\uFEFF/, '').split(/\r?\n/), f = {}, i = 0;
+    while (i < lines.length && (lines[i].trim() === '' || lines[i].trim()[0] === '#')) i++;
+    for (; i < lines.length; i++) {
+      var ln = lines[i].trim(); if (ln === '') break; if (ln[0] === '#') continue;
+      var m = /^([A-Za-z_]+)\s*[:：]\s*(.*)$/.exec(ln); if (m) f[m[1].toLowerCase()] = m[2].trim();
+    }
+    if (!f.text) return null;
+    var aliases = { '普通': 'common', '优秀': 'uncommon', '稀有': 'rare', '史诗': 'epic', '传说': 'legendary', '传奇': 'legendary' };
+    var r = (f.rarity || '').toLowerCase(); r = RC[r] ? r : (aliases[f.rarity] || 'common');
+    var c = blank();
+    c.id = f.id || ''; c.text = f.text; c.pinyin = f.pinyin || ''; c.meaning = f.meaning || ''; c.rarity = r; c.monster = f.monster || '👾'; c.name = f.name || '';
+    c.tags = f.tags || ''; c.price = f.price || ''; c.exclusive = /^(yes|true|y|1|是)$/i.test(f.exclusive || '');
+    c.story = lines.slice(i + 1).filter(function (l) { return l.trim()[0] !== '#'; }).join('\n').trim();
+    return c;
+  }
+  function deriveId(pinyin, text) {
+    var base = String(pinyin).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/\s+/).map(function (w) { return w.replace(/[^a-z]/g, '').charAt(0); }).join('');
+    return base || (text ? 'card' : '');
+  }
+  function validate(c, all) {
+    var e = [], w = [], dupe = all.some(function (o) { return o.uid !== c.uid && o.id === c.id; });
+    if (!c.text.trim()) e.push('Add the 成语 or saying itself.');
+    else if (!/[\u3400-\u9fff]/.test(c.text)) w.push('The phrase has no Chinese characters in it.');
+    if (!c.id) e.push('The card needs an ID (it becomes the file name).');
+    else if (!/^[a-z0-9][a-z0-9-]*$/.test(c.id)) e.push('The ID can only use lowercase letters, numbers and dashes.');
+    else if (dupe) e.push('Another card already uses the ID "' + c.id + '".');
+    if (String(c.price).trim() && !/^[1-9]\d*$/.test(String(c.price).trim())) e.push('Price must be a whole number above zero.');
+    if (c.exclusive && !String(c.price).trim()) w.push('"Shop only" needs a price, or nobody can ever get this card.');
+    var n = Array.from(c.text.trim()).length, py = c.pinyin.trim() ? c.pinyin.trim().split(/\s+/).length : 0;
+    if (!c.pinyin.trim()) w.push('No pinyin yet.'); else if (n && py !== n) w.push('The phrase has ' + n + ' characters but the pinyin has ' + py + ' syllables.');
+    if (!c.meaning.trim()) w.push('No meaning yet.');
+    if (!c.name.trim()) w.push('No monster name, so the card shows the phrase as its name.');
+    return { errors: e, warns: w };
+  }
+
+  /* ----- pictures: anything dropped becomes a proper PNG sized for the game ----- */
+  function loadImage(file) {
+    return new Promise(function (res, rej) {
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () { res({ el: img, w: img.naturalWidth || 1300, h: img.naturalHeight || 1040, done: function () { URL.revokeObjectURL(url); } }); };
+      img.onerror = function () { URL.revokeObjectURL(url); rej(new Error('unreadable')); };
+      img.src = url;
+    });
+  }
+  async function toGamePng(file) {
+    var src;
+    try { var b = await createImageBitmap(file); src = { el: b, w: b.width, h: b.height, done: function () { if (b.close) b.close(); } }; }
+    catch (e) { src = await loadImage(file); }
+    var max = MAX_SIDE, url = '', cw = 0, ch = 0;
+    for (var pass = 0; pass < 3; pass++) {
+      var s = Math.min(1, max / Math.max(src.w, src.h));
+      cw = Math.max(1, Math.round(src.w * s)); ch = Math.max(1, Math.round(src.h * s));
+      var cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
+      var g = cv.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(src.el, 0, 0, cw, ch);
+      url = cv.toDataURL('image/png');
+      if (url.length * 0.75 < 1.8e6) break; max = Math.round(max * 0.75);     // keep it light for the game: shrink and retry
+    }
+    src.done();
+    var b64 = url.split(',')[1];
+    return { url: url, b64: b64, w: cw, h: ch, bytes: Math.round(b64.length * 0.75) };
+  }
+  var MAGIC = [['iVBORw0K', 'png'], ['/9j/', 'jpg'], ['R0lGOD', 'gif'], ['UklGR', 'webp'], ['PHN2Zy', 'svg'], ['PD94bWw', 'svg']];
+  function sniff(b64) { for (var i = 0; i < MAGIC.length; i++) if (b64.indexOf(MAGIC[i][0]) === 0) return MAGIC[i][1]; return ''; }
+  var MIME = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif', svg: 'image/svg+xml' };
+  var kb = function (n) { return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; };
+
+  /* ================= app state ================= */
+  var S = {
+    mode: 'boot',            // boot | setup | desktop | manual
+    desktop: null, root: '', owner: '', repo: '', cards: [], sel: null, filter: { q: '', r: '' },
+    changed: {}, removed: [], busy: false, saveT: {}, seedCards: null
+  };
+  var cur = function () { return S.cards.filter(function (c) { return c.uid === S.sel; })[0] || null; };
+  var siteUrl = function () { return S.owner ? 'https://' + S.owner + '.github.io/' + S.repo + '/' : 'https://manifoldecor.github.io/chengyu/'; };
+  var repoUrl = function (p) { return 'https://github.com/' + (S.owner || 'manifoldecor') + '/' + (S.repo || 'chengyu') + (p || ''); };
+
+  /* ================= desktop backend (your project folder + git) ================= */
+  var D = {
+    fs: function () { return S.desktop.fs; },
+    path: function (rel) { return S.root + '/' + rel; },
+    exec: function (cmd, o) { return S.desktop.childProcess.exec(cmd, Object.assign({ cwd: S.root, timeout: 120000 }, o || {})); },
+    isProject: async function (p) { try { return (await S.desktop.fs.exists(p + '/content/cards')) && (await S.desktop.fs.exists(p + '/.git')); } catch (e) { return false; } },
+    async findRoot() {
+      if (window.WORKSHOP_ROOT && await D.isProject(window.WORKSHOP_ROOT)) return window.WORKSHOP_ROOT;   // the local edition knows its folder
+      var home = String(await S.desktop.os.homedir()).replace(/\\/g, '/'), saved = null;
+      try { saved = localStorage.getItem('card-workshop-root'); } catch (e) {}
+      var cands = [saved, home + '/OneDrive/Desktop/chengyu', home + '/Desktop/chengyu', home + '/Documents/chengyu', home + '/chengyu'].filter(Boolean);
+      for (var i = 0; i < cands.length; i++) if (await D.isProject(cands[i])) return cands[i];
+      return '';
+    },
+    async loadRepoInfo() {
+      try { var r = await D.exec('git remote get-url origin'); var m = /github\.com[:/]+([^/]+)\/([^/\s]+?)(?:\.git)?\s*$/.exec(r.stdout.trim()); if (m) { S.owner = m[1]; S.repo = m[2]; } } catch (e) {}
+    },
+    async loadCards() {
+      var fs = S.desktop.fs, files = (await fs.readdir(D.path('content/cards'))).filter(function (e) { return e.isFile && /\.md$/i.test(e.name) && e.name[0] !== '_'; });
+      var cards = [], bad = [];
+      for (var i = 0; i < files.length; i++) {
+        var name = files[i].name.replace(/\.md$/i, ''), text = await fs.readFile(D.path('content/cards/' + files[i].name), 'utf8'), p = parseMd(text);
+        if (!p) { bad.push(files[i].name); continue; }
+        var c = Object.assign(blank(), p); c.file = name; c.id = c.id || name; c.onDisk = true;
+        cards.push(hydrate(c));
+      }
+      var art = {};
+      if (await fs.exists(D.path('content/art'))) {
+        var af = (await fs.readdir(D.path('content/art'))).filter(function (e) { return e.isFile && /\.(png|jpe?g|webp|gif|svg)$/i.test(e.name); });
+        for (var j = 0; j < af.length; j++) {
+          var base = af[j].name.replace(/\.[^.]+$/, '').toLowerCase(), ext = af[j].name.split('.').pop().toLowerCase().replace('jpeg', 'jpg');
+          (art[base] = art[base] || []).push({ file: af[j].name, ext: ext });
+        }
+      }
+      for (var k = 0; k < cards.length; k++) {
+        var list = art[cards[k].id.toLowerCase()]; if (!list) continue;
+        var a = list[0], b64 = await fs.readFile(D.path('content/art/' + a.file), 'base64'), real = sniff(b64) || a.ext;
+        cards[k].art = { url: 'data:' + (MIME[real] || MIME[a.ext]) + ';base64,' + b64, file: a.file, ext: a.ext, real: real, bytes: Math.round(b64.length * 0.75), extra: list.slice(1).map(function (x) { return x.file; }) };
+        measure(cards[k]);
+      }
+      return { cards: cards, bad: bad };
+    },
+    async saveCard(c) {
+      await S.desktop.fs.mkdir(D.path('content/cards'), { recursive: true });
+      c.file = c.file || c.id;
+      await S.desktop.fs.writeFile(D.path('content/cards/' + c.file + '.md'), toMd(c), 'utf8');
+      c.onDisk = true;
+    },
+    async saveArt(c, pic) {
+      var fs = S.desktop.fs, id = c.id;
+      await fs.mkdir(D.path('content/art'), { recursive: true });
+      await fs.writeFile(D.path('content/art/' + id + '.png'), pic.b64, 'base64');
+      // any other picture with this card's name would compete with the new one in the game: move it to the Recycle Bin
+      var others = (await fs.readdir(D.path('content/art'))).filter(function (e) { return e.isFile && e.name.replace(/\.[^.]+$/, '').toLowerCase() === id.toLowerCase() && e.name !== id + '.png'; });
+      for (var i = 0; i < others.length; i++) await S.desktop.shell.trashItem(D.path('content/art/' + others[i].name));
+      return others.map(function (e) { return e.name; });
+    },
+    async trashCard(c) {
+      var fs = S.desktop.fs, id = c.id;
+      if (await fs.exists(D.path('content/cards/' + (c.file || id) + '.md'))) await S.desktop.shell.trashItem(D.path('content/cards/' + (c.file || id) + '.md'));
+      if (c.art && c.art.file && await fs.exists(D.path('content/art/' + c.art.file))) await S.desktop.shell.trashItem(D.path('content/art/' + c.art.file));
+    },
+    /** What differs from what is already on GitHub, from git itself. */
+    async refreshChanges() {
+      var r = await D.exec('git -c core.quotepath=off status --porcelain -- content'), ch = {}, rem = [];
+      r.stdout.split(/\r?\n/).forEach(function (ln) {
+        if (!ln.trim()) return; var code = ln.slice(0, 2), p = ln.slice(3).replace(/^"|"$/g, ''), m;
+        if ((m = /^content\/cards\/([^/]+)\.md$/.exec(p))) { if (m[1][0] === '_') return; if (/D/.test(code)) rem.push(m[1]); else (ch[m[1]] = ch[m[1]] || {}).card = /\?|A/.test(code) ? 'new' : 'edited'; }
+        else if ((m = /^content\/art\/([^/]+)\.[^./]+$/.exec(p))) { (ch[m[1].toLowerCase()] = ch[m[1].toLowerCase()] || {}).art = /D/.test(code) ? 'removed' : 'changed'; }
+      });
+      S.changed = ch; S.removed = rem; renderAll();
+    }
+  };
+  var refreshT = 0;
+  function scheduleRefresh() { if (S.mode !== 'desktop') return; clearTimeout(refreshT); refreshT = setTimeout(function () { D.refreshChanges().catch(function () {}); }, 450); }
+
+  function hydrate(c) { return Object.assign({ uid: uid(), file: '', onDisk: false, idTouched: true, art: null, base: null, deleted: false, artSent: false }, c); }
+  function measure(c) {
+    if (!c.art) return; var im = new Image(); im.onload = function () { if (c.art) { c.art.w = im.naturalWidth; c.art.h = im.naturalHeight; if (cur() === c) renderDrawer(true); } }; im.src = c.art.url;
+  }
+
+  /* ----- manual mode (no direct access): the old GitHub hand-off ----- */
+  function statusOf(c) {
+    if (c.deleted) return 'deleted';
+    if (!c.base) return 'new';
+    return JSON.stringify(snap(c)) !== JSON.stringify(c.base) ? 'edited' : (c.art && c.art.fresh && !c.artSent ? 'edited' : 'published');
+  }
+  function isChanged(c) {
+    if (S.mode === 'desktop') { var x = S.changed[c.id.toLowerCase()]; return !!(x && (x.card || x.art)) || !c.onDisk; }
+    return statusOf(c) !== 'published';
+  }
+  function changedCount() {
+    if (S.mode === 'desktop') { var ids = Object.keys(S.changed).length + S.removed.length; return ids; }
+    return S.cards.filter(function (c) { return statusOf(c) !== 'published'; }).length;
+  }
+
+  /* ================= setup / boot ================= */
+  function center(html) { $('#main').innerHTML = '<div class="center">' + html + '</div>'; $('#folder').hidden = true; $('#publish').hidden = true; }
+
+  async function boot() {
+    var desktop = null;
+    try { if (typeof claude !== 'undefined') desktop = await claude.use('desktop'); } catch (e) {}
+    S.desktop = desktop;
+    if (desktop && desktop.app && desktop.app.dock) { try { desktop.app.dock.setIcon(drawIcon()).catch(function () {}); } catch (e) {} }
+    S.seedCards = JSON.parse($('#seed').textContent);
+    if (desktop && desktop.fs) {
+      var perm = 'unavailable'; try { perm = await desktop.permissions.state('full-access'); } catch (e) {}
+      if (perm === 'granted') return connect();
+      return setupAccess(perm);
+    }
+    var avail = ''; try { avail = desktop && desktop.install ? await desktop.install.state() : ''; } catch (e) {}
+    return setupInstall(avail);
+  }
+  function drawIcon() {
+    var c = document.createElement('canvas'); c.width = c.height = 256; var g = c.getContext('2d');
+    g.fillStyle = '#b3261e'; g.beginPath(); g.roundRect(8, 8, 240, 240, 54); g.fill();
+    g.fillStyle = '#f6e7c8'; g.font = '170px KaiTi, "Kaiti SC", serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('卡', 128, 138);
+    return c.toDataURL('image/png');
+  }
+  function manualLink() { return '<button class="linkish" type="button" data-act="manual">Use it without direct publishing</button>'; }
+  function setupInstall(avail) {
+    center('<span class="cn" style="font-family:var(--brush);font-size:56px;color:var(--accent);line-height:1">卡坊</span><h1>Publish straight from this page</h1>' +
+      '<p>Drop a picture, press Publish, and your cards are live. For that, this page needs to run as a small desktop app so it can save into your project folder and send it to GitHub with your own login. No downloads, no passwords here.</p>' +
+      (avail === 'available' ? '<button class="btn primary" type="button" data-act="install">Set up direct publishing</button>' :
+        avail === 'installed' ? '<p><b>Already installed.</b> Open Card Workshop from your computer\'s apps instead of this tab.</p>' :
+        '<p class="hint">Open this artifact in the Claude desktop app and choose <b>Install as app</b>.</p>') + manualLink());
+  }
+  function setupAccess(perm) {
+    center('<span class="cn" style="font-family:var(--brush);font-size:56px;color:var(--accent);line-height:1">卡坊</span><h1>Allow access to your project folder</h1>' +
+      '<p>The workshop saves cards and pictures into your game\'s <b>content</b> folder and publishes with your existing GitHub login. Claude will ask you to confirm once.</p>' +
+      (perm === 'denied' ? '<button class="btn primary" type="button" data-act="manage">Open permissions</button><p class="hint">Access was turned off. Turn on full access for this app, then reopen it.</p>' :
+        perm === 'unavailable' ? '<p class="hint">Full access isn\'t available for this page right now, so direct publishing is off.</p>' :
+        '<button class="btn primary" type="button" data-act="allow">Allow access</button>') + manualLink());
+  }
+  async function connect() {
+    center('<p class="hint">Opening your project…</p>');
+    try {
+      S.root = await D.findRoot();
+      if (!S.root) return setupFolder('');
+      await D.loadRepoInfo();
+      var r = await D.loadCards(); S.cards = r.cards; S.mode = 'desktop'; S.sel = null;
+      try { localStorage.setItem('card-workshop-root', S.root); } catch (e) {}
+      await D.refreshChanges().catch(function () {});
+      renderAll();
+      if (r.bad.length) say('Skipped ' + r.bad.join(', ') + ': no "text:" line.');
+    } catch (e) { center('<h1>Couldn\'t open the project</h1><p>' + esc(e.message || e) + '</p><button class="btn" type="button" data-act="retry">Try again</button>' + manualLink()); }
+  }
+  function setupFolder(msg) {
+    center('<h1>Where is your game folder?</h1><p>I couldn\'t find it automatically. Paste the folder that contains <b>content</b> and <b>package.json</b>.</p>' +
+      '<div class="field" style="width:100%;text-align:left"><label for="root-in">Folder path</label><input class="in" id="root-in" placeholder="C:/Users/you/Desktop/chengyu" autocomplete="off"></div>' +
+      (msg ? '<p style="color:var(--bad)">' + esc(msg) + '</p>' : '') + '<button class="btn primary" type="button" data-act="folder">Open this folder</button>' + manualLink());
+  }
+  function startManual() {
+    S.mode = 'manual'; S.owner = ''; S.repo = '';
+    S.cards = S.seedCards.map(function (s) { var c = Object.assign(blank(), s); c.file = c.id; var h = hydrate(c); h.base = clone(snap(c)); return h; });
+    try { var raw = localStorage.getItem('card-workshop-manual'); if (raw) { var saved = JSON.parse(raw); if (Array.isArray(saved) && saved.length) S.cards = saved.map(function (c) { var h = hydrate(c); h.art = null; return h; }); } } catch (e) {}
+    S.sel = null; renderAll();
+  }
+  var manT = 0;
+  function persistManual() { if (S.mode !== 'manual') return; clearTimeout(manT); manT = setTimeout(function () { try { localStorage.setItem('card-workshop-manual', JSON.stringify(S.cards.map(function (c) { var o = Object.assign({}, c); o.art = null; return o; }))); } catch (e) {} }, 300); }
+
+  /* ================= gallery ================= */
+  function renderAll() {
+    renderBar(); renderGallery(); if (S.sel) renderDrawer(false);
+  }
+  function renderBar() {
+    var f = $('#folder'), p = $('#publish');
+    if (S.mode === 'desktop') {
+      f.hidden = false; f.innerHTML = '<span class="dot"></span>' + esc(S.root.split('/').pop()) + ' <button class="linkish" type="button" data-act="open-folder">Open folder</button>';
+    } else if (S.mode === 'manual') {
+      f.hidden = false; f.innerHTML = '<span class="dot off"></span>Manual mode · <button class="linkish" type="button" data-act="setup">Set up direct publishing</button>';
+    } else f.hidden = true;
+    var n = S.mode === 'boot' || S.mode === 'setup' ? 0 : changedCount();
+    p.hidden = !(S.mode === 'desktop' || S.mode === 'manual');
+    p.disabled = n === 0; p.innerHTML = n ? 'Publish <span class="count">' + n + '</span>' : 'Nothing to publish';
+  }
+  function visibleCards() {
+    var q = S.filter.q.trim().toLowerCase(), order = RAR.map(function (r) { return r.k; });
+    var rows = S.cards.filter(function (c) {
+      if (S.filter.r && c.rarity !== S.filter.r) return false;
+      return !q || (c.text + ' ' + c.name + ' ' + c.meaning + ' ' + c.pinyin + ' ' + c.id).toLowerCase().indexOf(q) >= 0;
+    });
+    rows.sort(function (a, b) { return order.indexOf(a.rarity) - order.indexOf(b.rarity) || a.id.localeCompare(b.id); });
+    return rows;
+  }
+  function renderGallery() {
+    if (S.mode !== 'desktop' && S.mode !== 'manual') return;
+    var chips = '<button class="chip" type="button" data-r="" aria-pressed="' + (S.filter.r === '') + '">All ' + S.cards.length + '</button>' + RAR.map(function (r) {
+      return '<button class="chip" type="button" data-r="' + r.k + '" aria-pressed="' + (S.filter.r === r.k) + '"><span class="dot" style="--dot:var(--c-' + r.k + ')"></span>' + r.n + '</button>'; }).join('');
+    var tiles = visibleCards().map(function (c) {
+      var flag = '', v = validate(c, S.cards);
+      if (!c.onDisk && S.mode === 'desktop') flag = '<span class="flag warn">Draft</span>';
+      else if (c.art && c.art.real && c.art.real !== c.art.ext) flag = '<span class="flag warn">Fix picture</span>';
+      else if (isChanged(c)) flag = '<span class="flag" title="Not published yet">Changed</span>';
+      else if (v.errors.length) flag = '<span class="flag warn">Needs fixing</span>';
+      return '<button type="button" class="tile" data-uid="' + c.uid + '" aria-current="' + (c.uid === S.sel) + '" style="--c:' + RC[c.rarity] + '">' + flag +
+        '<span class="pic">' + (c.art ? '<img alt="" src="' + esc(c.art.url) + '">' : esc(c.monster || '👾')) + '</span>' +
+        '<span class="hz">' + esc(c.text || 'New card') + '</span><span class="nm">' + esc(c.name || c.id || 'Unnamed') + '</span></button>';
+    }).join('');
+    $('#main').innerHTML = '<div class="toolbar"><input class="search" id="search" type="search" placeholder="Search cards" aria-label="Search cards" value="' + esc(S.filter.q) + '">' +
+      '<div class="chips" role="group" aria-label="Filter by rarity">' + chips + '</div></div>' +
+      '<p class="hint">Drag pictures straight onto a card, or anywhere on the page. A picture named like the card (for example <b>hsty.png</b>) finds its card by itself.</p>' +
+      '<div class="gallery" id="gallery">' + tiles + '<button type="button" class="tile add" data-act="new"><span style="font-size:30px;line-height:1">+</span>New card</button></div>' +
+      (visibleCards().length ? '' : '<p class="empty">No cards match. Clear the search or filter.</p>');
+    var si = $('#search'); if (si && S.filter.q) { /* keep typing position after re-render */ }
+  }
+
+  /* ================= drawer (editing) ================= */
+  function openCard(u) { S.sel = u; document.body.classList.add('drawer-open'); $('#drawer').setAttribute('aria-hidden', 'false'); renderDrawer(true); renderGallery(); }
+  function closeDrawer() { S.sel = null; document.body.classList.remove('drawer-open'); $('#drawer').setAttribute('aria-hidden', 'true'); renderGallery(); }
+
+  function saveLine(c) {
+    var v = validate(c, S.cards);
+    if (S.mode === 'manual') return ['', ''];
+    if (v.errors.length) return ['bad', 'Not saved yet: ' + v.errors[0]];
+    return c.saving ? ['', 'Saving…'] : ['ok', '✓ Saved in your project folder'];
+  }
+  function renderDrawer(full) {
+    var c = cur(), d = $('#drawer'); if (!c) { d.innerHTML = ''; return; }
+    if (!full) { renderPreview(c); renderDrawerStatus(c); return; }
+    var fixed = !!c.file && c.onDisk, seg = RAR.map(function (r) { return '<button type="button" data-rar="' + r.k + '" aria-pressed="' + (c.rarity === r.k) + '" style="--dot:var(--c-' + r.k + ')" title="' + esc(r.h) + '"><span class="dot"></span>' + r.n + '</button>'; }).join('');
+    var em = MONSTERS.map(function (m) { return '<button type="button" data-emoji="' + m + '" aria-label="Use ' + m + '">' + m + '</button>'; }).join('');
+    d.innerHTML = '<div class="head"><h2>' + (c.onDisk || c.base ? 'Edit card' : 'New card') + '</h2><span class="savestate" id="savestate"></span><button class="x" type="button" data-act="close" aria-label="Close">×</button></div>' +
+      '<div class="body"><div id="preview"></div>' +
+      '<div class="field"><span class="lab">Picture</span><div id="artbox"></div></div>' +
+      '<div class="field"><label for="f-text">成语 or saying</label><input class="in hz" id="f-text" data-f="text" value="' + esc(c.text) + '" placeholder="画蛇添足" autocomplete="off"></div>' +
+      '<div class="field"><label for="f-pinyin">Pinyin</label><input class="in" id="f-pinyin" data-f="pinyin" value="' + esc(c.pinyin) + '" placeholder="huà shé tiān zú" autocomplete="off"></div>' +
+      '<div class="field"><label for="f-meaning">Meaning</label><input class="in" id="f-meaning" data-f="meaning" value="' + esc(c.meaning) + '" placeholder="To ruin something by adding unnecessary detail" autocomplete="off"></div>' +
+      '<div class="field"><span class="lab" id="rar-l">How hard to get</span><div class="seg" role="group" aria-labelledby="rar-l">' + seg + '</div><span class="hint" id="rar-h">' + esc(RAR.filter(function (r) { return r.k === c.rarity; })[0].h) + '.</span></div>' +
+      '<div class="two"><div class="field"><label for="f-name">Monster name</label><input class="in" id="f-name" data-f="name" value="' + esc(c.name) + '" placeholder="Footed Serpent" autocomplete="off"></div>' +
+      '<div class="field"><label for="f-monster">Emoji</label><input class="in" id="f-monster" data-f="monster" value="' + esc(c.monster) + '" autocomplete="off"></div></div>' +
+      '<div class="emojis" aria-label="Quick emoji picks">' + em + '</div>' +
+      '<div class="field"><label for="f-story">Story <span class="hint">(optional)</span></label><textarea class="in" id="f-story" data-f="story" placeholder="Where the saying comes from…">' + esc(c.story) + '</textarea></div>' +
+      '<details class="more"' + ((c.tags || c.price || c.exclusive) ? ' open' : '') + '><summary>Shop, themes and ID</summary><div style="display:grid;gap:12px">' +
+      '<div class="two"><div class="field"><label for="f-tags">Tags</label><input class="in" id="f-tags" data-f="tags" value="' + esc(c.tags) + '" placeholder="dragon, animal" autocomplete="off"></div>' +
+      '<div class="field"><label for="f-price">Shop price (ink)</label><input class="in" id="f-price" data-f="price" inputmode="numeric" value="' + esc(c.price) + '" placeholder="600" autocomplete="off"></div></div>' +
+      '<label class="check"><input type="checkbox" id="f-exclusive" data-f="exclusive"' + (c.exclusive ? ' checked' : '') + '><span><b>Shop only</b><br><span class="hint">Never drops from packs. Players can only buy it.</span></span></label>' +
+      '<div class="field"><label for="f-id">Card ID</label><input class="in" id="f-id" data-f="id" value="' + esc(c.id) + '" ' + (fixed || c.base ? 'disabled' : '') + ' autocomplete="off">' +
+      '<span class="hint">' + (fixed || c.base ? 'Locked: players already own this card by its ID.' : 'Made from the pinyin. It is the file name, and the name a picture needs to be found by.') + '</span></div></div></details>' +
+      '<div id="msgs"></div><div class="btnrow"><button class="btn danger small" type="button" data-act="remove">' + (c.onDisk || c.base ? 'Remove card' : 'Discard draft') + '</button></div></div>';
+    renderPreview(c); renderArt(c); renderDrawerStatus(c);
+  }
+  function renderDrawerStatus(c) {
+    var v = validate(c, S.cards), el = $('#savestate'), m = $('#msgs'); if (!el) return;
+    var s = saveLine(c); el.className = 'savestate ' + s[0]; el.textContent = s[1];
+    var pic = ''; if (c.art && c.art.real && c.art.real !== c.art.ext) pic = '';
+    m.innerHTML = (v.errors.length ? '<ul class="msgs bad">' + v.errors.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
+      (v.warns.length ? '<ul class="msgs warn">' + v.warns.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') + pic;
+  }
+  function renderPreview(c) {
+    var box = $('#preview'); if (!box) return;
+    var tier = RAR.map(function (r) { return r.k; }).indexOf(c.rarity), chars = Array.from(c.text.trim()).length || 4;
+    box.innerHTML = '<div class="cardwrap"><div class="card" style="--c:' + RC[c.rarity] + ';--n:' + chars + '"><div class="nm' + (c.name ? '' : ' ph') + '">' + esc(c.name || 'Monster name') + '</div>' +
+      '<div class="art">' + (c.art ? '<img alt="" src="' + esc(c.art.url) + '">' : esc(c.monster || '👾')) + '</div><div class="st">' + '★'.repeat(tier + 1) + '</div>' +
+      '<div class="hz' + (c.text ? '' : ' ph') + '">' + esc(c.text.trim() || '成语') + '</div><div class="py' + (c.pinyin ? '' : ' ph') + '">' + esc(c.pinyin || 'pīnyīn') + '</div><div class="mn' + (c.meaning ? '' : ' ph') + '">' + esc(c.meaning || 'What it means') + '</div></div></div>';
+  }
+  function renderArt(c) {
+    var box = $('#artbox'); if (!box) return;
+    var wrong = c.art && c.art.real && c.art.real !== c.art.ext;
+    var info = c.art ? (c.art.w ? c.art.w + '×' + c.art.h + ' · ' : '') + (c.art.real || c.art.ext || 'png').toUpperCase() + ' · ' + kb(c.art.bytes || 0) : '';
+    var ratio = c.art && c.art.w ? c.art.w / c.art.h : 0;
+    box.innerHTML = '<div class="drop-zone" id="dz" tabindex="0" role="button" aria-label="Drop a picture here or press Enter to choose one">' +
+      (c.art ? '<div class="meta"><img alt="" src="' + esc(c.art.url) + '"><span><b>' + esc(c.art.file || (c.id + '.png')) + '</b><br><span class="hint">' + info + '</span></span></div><span class="hint">Drop another picture to replace it</span>'
+             : '<b>Drop a picture here</b><span class="hint">or click to choose one. It becomes a game-ready PNG automatically.</span>') +
+      '<input type="file" id="art-file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" multiple hidden></div>' +
+      (wrong ? '<div class="fix"><span>This file is named <b>.' + esc(c.art.ext) + '</b> but is really a <b>' + esc(c.art.real.toUpperCase()) + '</b>. Renaming a picture doesn\'t convert it.</span><span><button class="btn small" type="button" data-act="fixart">Convert it to a real PNG</button></span></div>' : '') +
+      (c.art && c.art.extra && c.art.extra.length ? '<div class="fix"><span>There are other pictures for this card (' + esc(c.art.extra.join(', ')) + '). Only one can be used.</span></div>' : '') +
+      (ratio && (ratio > 1.8 || ratio < 0.75) ? '<span class="hint">The card shows the middle part of wide or tall pictures, as in the preview.</span>' : '');
+  }
+
+  /* ================= actions ================= */
+  function touched(c, immediate) {
+    persistManual(); renderPreview(c); renderDrawerStatus(c); renderBar();
+    if (S.mode !== 'desktop') { renderGallery(); return; }
+    clearTimeout(S.saveT[c.uid]); c.saving = true; renderDrawerStatus(c);
+    S.saveT[c.uid] = setTimeout(async function () {
+      var v = validate(c, S.cards); c.saving = false;
+      if (!v.errors.length) { try { await D.saveCard(c); scheduleRefresh(); } catch (e) { say('Couldn\'t save: ' + (e.message || e)); } }
+      renderDrawerStatus(c); renderGallery();
+    }, immediate ? 0 : 550);
+  }
+  async function setArt(c, file) {
+    if (!/^image\//.test(file.type) && !/\.(png|jpe?g|webp|gif|svg)$/i.test(file.name)) { say(file.name + ' is not a picture I can use.'); return false; }
+    if (!c.id) { say('Give the card a pinyin or ID first, so the picture has a name to be saved under.'); return false; }
+    try {
+      var pic = await toGamePng(file);
+      c.art = { url: pic.url, file: c.id + '.png', ext: 'png', real: 'png', bytes: pic.bytes, w: pic.w, h: pic.h, fresh: true, b64: pic.b64 }; c.artSent = false;
+      if (S.mode === 'desktop') {
+        if (!c.onDisk) { var v = validate(c, S.cards); if (v.errors.length) { say('Picture added. Finish the card details and it will be saved.'); touched(c, true); renderArt(c); return true; } await D.saveCard(c); }
+        var removed = await D.saveArt(c, pic); scheduleRefresh();
+        say('Saved ' + c.id + '.png (' + pic.w + '×' + pic.h + ', ' + kb(pic.bytes) + ')' + (removed.length ? ' and replaced ' + removed.join(', ') : '') + '. Press Publish when you are ready.');
+      } else say('Picture converted to ' + c.id + '.png. Use Publish for the steps.');
+      persistManual(); if (cur() === c) { renderPreview(c); renderArt(c); } renderGallery(); renderBar(); return true;
+    } catch (e) { say('Couldn\'t read that picture: ' + (e.message || e)); return false; }
+  }
+  async function dropFiles(files, target) {
+    var imgs = Array.prototype.filter.call(files, function (f) { return /^image\//.test(f.type) || /\.(png|jpe?g|webp|gif|svg)$/i.test(f.name); });
+    if (!imgs.length) return;
+    if (S.mode !== 'desktop' && S.mode !== 'manual') { say('Open a card first.'); return; }
+    var ok = 0, loose = [];
+    for (var i = 0; i < imgs.length; i++) {
+      var f = imgs[i], base = f.name.replace(/\.[^.]+$/, '').toLowerCase().replace(/\s*\(\d+\)$/, '');
+      var byName = S.cards.filter(function (c) { return c.id.toLowerCase() === base; })[0];
+      var dest = target || byName; if (!dest) { loose.push(f); continue; }
+      if (await setArt(dest, f)) ok++;
+    }
+    if (loose.length) {
+      var open = cur();
+      if (loose.length === 1 && open) { if (await setArt(open, loose[0])) ok++; }
+      else say(loose.length + ' picture' + (loose.length > 1 ? 's' : '') + ' didn\'t match a card. Name a file like its card ID (for example hsty.png), or drop it onto a card.');
+    }
+    if (ok > 1) say(ok + ' pictures saved. Press Publish when you are ready.');
+  }
+  function newCard() {
+    var c = hydrate(Object.assign(blank(), { idTouched: false })); S.cards.unshift(c); S.filter = { q: '', r: '' };
+    openCard(c.uid); setTimeout(function () { var el = $('#f-text'); if (el) el.focus(); }, 60);
+  }
+  var removeArmed = 0;
+  async function removeCard(c) {
+    if (!c.onDisk && !c.base) { S.cards = S.cards.filter(function (x) { return x.uid !== c.uid; }); closeDrawer(); say('Draft discarded.'); persistManual(); renderBar(); return; }
+    var btn = $('#drawer [data-act="remove"]');
+    if (removeArmed !== c.uid) { removeArmed = c.uid; if (btn) btn.textContent = 'Click again: remove ' + (c.text || c.id) + ' from the game'; setTimeout(function () { if (removeArmed === c.uid) { removeArmed = 0; if (btn) btn.textContent = 'Remove card'; } }, 4000); return; }
+    removeArmed = 0;
+    if (S.mode === 'desktop') { try { await D.trashCard(c); } catch (e) { say('Couldn\'t remove it: ' + (e.message || e)); return; } S.cards = S.cards.filter(function (x) { return x.uid !== c.uid; }); closeDrawer(); scheduleRefresh(); say('Moved to the Recycle Bin. Publish to remove it from the game.'); }
+    else { c.deleted = true; closeDrawer(); persistManual(); renderBar(); say('Marked for removal. Use Publish for the steps.'); }
+  }
+
+  /* ================= publish ================= */
+  function friendlyChanges() {
+    var rows = [];
+    if (S.mode === 'desktop') {
+      Object.keys(S.changed).forEach(function (id) {
+        var c = S.cards.filter(function (x) { return x.id.toLowerCase() === id; })[0], x = S.changed[id], what = [];
+        if (x.card === 'new') what.push('new card'); else if (x.card) what.push('edited'); if (x.art === 'changed') what.push('picture'); if (x.art === 'removed') what.push('picture removed');
+        rows.push({ hz: c ? c.text : id, id: id, what: what.join(' + ') || 'changed' });
+      });
+      S.removed.forEach(function (id) { rows.push({ hz: id, id: id, what: 'removed' }); });
+    } else {
+      S.cards.forEach(function (c) { var st = statusOf(c); if (st !== 'published') rows.push({ hz: c.text || c.id, id: c.id, what: st === 'new' ? 'new card' : st === 'deleted' ? 'removed' : 'edited' }); });
+    }
+    return rows;
+  }
+  function openPublish() {
+    var rows = friendlyChanges(); if (!rows.length) return;
+    var msg = rows.length === 1 ? 'Update ' + rows[0].id : 'Update ' + rows.length + ' cards';
+    if (S.mode === 'manual') return openManualPublish(rows);
+    $('#sheet').innerHTML = '<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="Publish changes"><h2>Publish ' + rows.length + (rows.length === 1 ? ' change' : ' changes') + '</h2>' +
+      '<ul class="changes">' + rows.map(function (r) { return '<li><span class="hz">' + esc(r.hz) + ' <span class="hint">' + esc(r.id) + '</span></span><span class="what">' + esc(r.what) + '</span></li>'; }).join('') + '</ul>' +
+      '<div class="field"><label for="msg">Note for the history <span class="hint">(optional)</span></label><input class="in" id="msg" value="' + esc(msg) + '" autocomplete="off"></div>' +
+      '<div id="progress"></div><div class="btnrow" id="pubbtns"><button class="btn primary" type="button" data-act="go">Publish now</button><button class="btn" type="button" data-act="cancel">Not yet</button></div></div></div>';
+  }
+  function stepList(steps) {
+    return '<ol class="steps">' + steps.map(function (s) {
+      return '<li class="' + s.st + '"><span class="ic">' + (s.st === 'ok' ? '✓' : s.st === 'bad' ? '!' : '') + '</span><span><b>' + esc(s.t) + '</b>' + (s.sub ? '<br><span class="sub">' + esc(s.sub) + '</span>' : '') + (s.log ? '<pre class="log">' + esc(s.log) + '</pre>' : '') + '</span></li>'; }).join('') + '</ol>';
+  }
+  async function runPublish(message) {
+    S.busy = true;
+    var steps = [{ t: 'Saving your changes', st: 'run' }, { t: 'Sending them to GitHub', st: '' }, { t: 'Building the game', st: '' }];
+    var show = function () { var p = $('#progress'); if (p) p.innerHTML = stepList(steps); };
+    $('#pubbtns').innerHTML = ''; show();
+    var fail = function (i, sub, log) { steps[i].st = 'bad'; steps[i].sub = sub; steps[i].log = log; show(); S.busy = false; $('#pubbtns').innerHTML = '<button class="btn primary" type="button" data-act="go">Try again</button><button class="btn" type="button" data-act="cancel">Close</button>'; };
+    try {
+      var r = await D.exec('git add -A -- content'); if (r.code) return fail(0, 'git add failed.', r.stderr || r.stdout);
+      var idn = await D.exec('git config user.name'), idm = await D.exec('git config user.email');
+      var ident = (idn.stdout.trim() && idm.stdout.trim()) ? '' : ' -c user.name="Card Workshop" -c user.email="card-workshop@users.noreply.github.com"';
+      r = await D.exec('git' + ident + ' commit -F -', { input: message || 'Update cards' });
+      if (r.code && !/nothing to commit/i.test(r.stdout + r.stderr)) return fail(0, 'Couldn\'t save the update.', r.stderr || r.stdout);
+      steps[0].st = 'ok'; steps[1].st = 'run'; show();
+      r = await D.exec('git pull --rebase --autostash'); if (r.code) return fail(1, 'GitHub has newer changes that clash with yours.', r.stderr || r.stdout);
+      r = await D.exec('git push'); if (r.code) return fail(1, 'GitHub didn\'t accept the update. Are you signed in to git on this computer?', r.stderr || r.stdout);
+      var head = (await D.exec('git rev-parse HEAD')).stdout.trim();
+      steps[1].st = 'ok'; steps[2].st = 'run'; steps[2].sub = 'Usually under a minute.'; show();
+      var live = false, watched = false;
+      for (var i = 0; i < 48 && !live && S.owner && S.repo; i++) {   // can only watch the build when we know which GitHub repo this is
+        await sleep(i === 0 ? 4000 : 5000);
+        var g = await D.exec('gh run list --repo ' + S.owner + '/' + S.repo + ' --limit 5 --json status,conclusion,headSha');
+        if (g.code) break;                                   // no GitHub CLI here: can't watch, so just say what we know
+        var runs = []; try { runs = JSON.parse(g.stdout); } catch (e) {}
+        var mine = runs.filter(function (x) { return x.headSha === head; })[0];
+        if (mine) { watched = true; steps[2].sub = mine.status === 'completed' ? '' : 'Building…'; show();
+          if (mine.status === 'completed') { if (mine.conclusion === 'success') live = true; else return fail(2, 'The build failed, so the live game is unchanged. A card file probably has a mistake.', 'Open the Actions tab on GitHub to see which one:\n' + repoUrl('/actions')); } }
+      }
+      steps[2].st = 'ok'; steps[2].sub = live ? 'Live now.' : (watched ? 'Still building. It will be live shortly.' : 'Sent. It goes live in about a minute.'); show();
+      S.busy = false; await D.refreshChanges().catch(function () {});
+      $('#pubbtns').innerHTML = '<a class="btn primary" href="' + esc(siteUrl()) + '" target="_blank" rel="noopener noreferrer">Open the game ↗</a><button class="btn" type="button" data-act="cancel">Done</button>';
+    } catch (e) { fail(steps.findIndex(function (s) { return s.st === 'run'; }) < 0 ? 0 : steps.findIndex(function (s) { return s.st === 'run'; }), (e && e.message) || String(e), ''); }
+  }
+
+  /* ----- manual mode publish: GitHub's own pages do the last click ----- */
+  var gh = function (path) { return repoUrl('/' + path); };
+  function lnk(href, label, primary) { return '<a class="btn' + (primary ? ' primary' : '') + ' small" href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + ' ↗</a>'; }
+  function openManualPublish(rows) {
+    var items = S.cards.filter(function (c) { return statusOf(c) !== 'published'; }).map(function (c) {
+      var st = statusOf(c), md = toMd(c), v = validate(c, S.cards), bad = v.errors.length > 0, h = '<li><div><b class="hz" style="font-family:var(--hanzi);font-size:18px">' + esc(c.text || c.id) + '</b> <span class="hint">' + esc(c.id) + ' · ' + (st === 'new' ? 'new card' : st === 'deleted' ? 'removed' : 'edited') + '</span></div>';
+      if (bad) h += '<ul class="msgs bad">' + v.errors.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul>';
+      h += '<div class="btnrow">';
+      if (c.art && st !== 'deleted') h += '<button class="btn small" type="button" data-act="art-save" data-uid="' + c.uid + '">Save ' + esc(c.id) + '.png</button>' + lnk(gh('upload/main/content/art'), 'Open picture uploader');
+      if (st === 'new') h += lnk(gh('new/main/content/cards?filename=' + encodeURIComponent(c.id + '.md') + '&value=' + encodeURIComponent(md)), 'Add card on GitHub', true);
+      else if (st === 'edited') h += '<button class="btn small" type="button" data-act="copy" data-uid="' + c.uid + '">Copy card file</button>' + lnk(gh('edit/main/content/cards/' + encodeURIComponent(c.id) + '.md'), 'Edit on GitHub', true);
+      else h += lnk(gh('delete/main/content/cards/' + encodeURIComponent(c.id) + '.md'), 'Delete on GitHub', true);
+      h += '<button class="btn small" type="button" data-act="mark" data-uid="' + c.uid + '">I committed it</button></div></li>'; return h;
+    }).join('');
+    $('#sheet').innerHTML = '<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="Publish changes"><h2>Publish ' + rows.length + (rows.length === 1 ? ' change' : ' changes') + '</h2>' +
+      '<p class="hint">Direct publishing isn\'t set up, so GitHub\'s own pages finish the job. Each link opens with your card already filled in: press <b>Commit changes</b> there.</p><ul class="changes" style="gap:14px">' + items + '</ul>' +
+      '<div class="btnrow"><button class="btn" type="button" data-act="cancel">Close</button><button class="btn small" type="button" data-act="setup">Set up direct publishing</button></div></div></div>';
+  }
+
+  /* ================= events ================= */
+  document.addEventListener('click', async function (e) {
+    var t = e.target.closest('[data-act],[data-uid],[data-r],[data-rar],[data-emoji]'); if (!t) { if (e.target.id === 'scrim' && !S.busy) { $('#sheet').innerHTML = ''; } return; }
+    var act = t.dataset.act, c = cur();
+    if (t.dataset.rar && c) { c.rarity = t.dataset.rar; $('#drawer').querySelectorAll('[data-rar]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.rar === c.rarity)); });
+      $('#rar-h').textContent = RAR.filter(function (x) { return x.k === c.rarity; })[0].h + '.'; touched(c, true); return; }
+    if (t.dataset.emoji && c) { c.monster = t.dataset.emoji; $('#f-monster').value = c.monster; touched(c); return; }
+    if (t.dataset.r !== undefined && !act) { S.filter.r = S.filter.r === t.dataset.r ? '' : t.dataset.r; renderGallery(); return; }
+    if (t.dataset.uid && !act && t.classList.contains('tile')) { openCard(t.dataset.uid); return; }
+    switch (act) {
+      case 'install': try { var r = await S.desktop.install.request(); if (r === 'installed') center('<h1>Installing…</h1><p>When it finishes, open <b>Card Workshop</b> from your computer\'s apps. This tab is no longer needed.</p>' + manualLink()); else if (r === 'cancelled') say('No problem. You can set it up any time.'); else say('Couldn\'t set it up here. Try from the Claude desktop app.'); } catch (err) { say('Couldn\'t set it up: ' + (err.message || err)); } break;
+      case 'allow': try { var p = await S.desktop.permissions.request(['full-access']); if (p['full-access'] === 'granted') connect(); else setupAccess(p['full-access']); } catch (err) { say('Couldn\'t ask: ' + (err.message || err)); } break;
+      case 'manage': try { await S.desktop.permissions.manage(); var ps = await S.desktop.permissions.state('full-access'); if (ps === 'granted') connect(); } catch (err) { say('Open the app\'s Permissions menu to change this.'); } break;
+      case 'folder': { var v = ($('#root-in').value || '').trim().replace(/\\/g, '/').replace(/\/+$/, ''); if (!v) return; if (await D.isProject(v)) { try { localStorage.setItem('card-workshop-root', v); } catch (err) {} connect(); } else setupFolder('That folder doesn\'t have content/cards and a .git folder in it.'); break; }
+      case 'retry': connect(); break;
+      case 'manual': startManual(); break;
+      case 'setup': $('#sheet').innerHTML = ''; S.mode = 'setup'; document.body.classList.remove('drawer-open'); boot(); break;
+      case 'close': closeDrawer(); break;
+      case 'new': newCard(); break;
+      case 'remove': if (c) removeCard(c); break;
+      case 'fixart': if (c && c.art) { var blob = await (await fetch(c.art.url)).blob(); await setArt(c, new File([blob], c.id + '.' + c.art.ext, { type: blob.type })); } break;
+      case 'open-folder': try { await S.desktop.shell.showItemInFolder(S.root + '/content'); } catch (err) {} break;
+      case 'go': { var m = $('#msg'); runPublish(m ? m.value.trim() : ''); break; }
+      case 'cancel': if (!S.busy) $('#sheet').innerHTML = ''; break;
+      case 'copy': { var cc = S.cards.filter(function (x) { return x.uid === t.dataset.uid; })[0]; if (cc) try { await navigator.clipboard.writeText(toMd(cc)); say('Card file copied. Paste it into GitHub.'); } catch (err) { say('Couldn\'t copy. Select the text on GitHub\'s page instead.'); } break; }
+      case 'mark': { var mc = S.cards.filter(function (x) { return x.uid === t.dataset.uid; })[0]; if (!mc) break; if (mc.deleted) S.cards = S.cards.filter(function (x) { return x !== mc; }); else { mc.base = clone(snap(mc)); if (mc.art) mc.artSent = true; } persistManual(); renderBar(); renderGallery(); openPublishAgain(); break; }
+      case 'art-save': { var ac = S.cards.filter(function (x) { return x.uid === t.dataset.uid; })[0]; if (ac && ac.art) { try { var dl = await claude.use('downloads'); if (!dl) throw new Error('n/a'); var bb = await (await fetch(ac.art.url)).blob(); await dl.save({ filename: ac.id + '.png', data: bb }); say('Saved. Drop it onto the GitHub uploader.'); } catch (err) { say('Couldn\'t save it here. Right-click the preview picture and save it as ' + ac.id + '.png.'); } } break; }
+    }
+  });
+  function openPublishAgain() { var rows = friendlyChanges(); if (!rows.length) { $('#sheet').innerHTML = ''; say('All published.'); } else openManualPublish(rows); }
+  $('#publish').addEventListener('click', openPublish);
+  document.addEventListener('input', function (e) {
+    if (e.target.id === 'search') { S.filter.q = e.target.value; var pos = e.target.selectionStart; renderGallery(); var s = $('#search'); if (s) { s.focus(); try { s.setSelectionRange(pos, pos); } catch (x) {} } return; }
+    var c = cur(), f = e.target.dataset && e.target.dataset.f; if (!c || !f) return;
+    c[f] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    if (f === 'id') c.idTouched = true;
+    if ((f === 'pinyin' || f === 'text') && !c.onDisk && !c.base && !c.idTouched) {
+      var base = deriveId(c.pinyin, c.text), id = base, n = 2; while (base && S.cards.some(function (o) { return o.uid !== c.uid && o.id === id; })) id = base + '-' + (n++);
+      c.id = id; var el = $('#f-id'); if (el) el.value = c.id;
+    }
+    touched(c);
+  });
+  document.addEventListener('change', function (e) { if (e.target.id === 'art-file') { var c = cur(); if (c && e.target.files.length) { dropFiles(e.target.files, c); } e.target.value = ''; } });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !S.busy) { if ($('#sheet').innerHTML) $('#sheet').innerHTML = ''; else if (S.sel) closeDrawer(); }
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.id === 'dz') { e.preventDefault(); var f = $('#art-file'); if (f) f.click(); }
+  });
+  document.addEventListener('click', function (e) { if (e.target.closest('#dz') && !e.target.closest('input')) { var f = $('#art-file'); if (f) f.click(); } });
+
+  // drag & drop: onto a card tile, the open card, or anywhere (a file named after a card finds that card). Never let the browser open the file.
+  var hasFiles = function (e) { return e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types || [], 'Files') >= 0; };
+  var overTile = null;
+  function markTile(t) { if (overTile && overTile !== t) overTile.classList.remove('drop'); overTile = t; if (t) t.classList.add('drop'); }
+  ['dragenter', 'dragover'].forEach(function (n) { document.addEventListener(n, function (e) {
+    if (!hasFiles(e)) return; e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
+    var t = e.target.closest && e.target.closest('.tile[data-uid]'); markTile(t || null); document.body.classList.toggle('dropping', !t && !e.target.closest('#dz'));
+    var dz = e.target.closest && e.target.closest('#dz'); var z = $('#dz'); if (z) z.classList.toggle('over', !!dz);
+  }); });
+  document.addEventListener('dragleave', function (e) { if (!e.relatedTarget) { document.body.classList.remove('dropping'); markTile(null); } });
+  document.addEventListener('drop', function (e) {
+    if (!hasFiles(e)) return; e.preventDefault();
+    var t = e.target.closest && e.target.closest('.tile[data-uid]'), dz = e.target.closest && e.target.closest('#dz');
+    document.body.classList.remove('dropping'); markTile(null);
+    var target = t ? S.cards.filter(function (c) { return c.uid === t.dataset.uid; })[0] : (dz ? cur() : null);
+    dropFiles(e.dataTransfer.files, target);
+  });
+  document.addEventListener('paste', function (e) {
+    var files = e.clipboardData && e.clipboardData.files; if (!files || !files.length) return;
+    var c = cur(); if (c && /^image\//.test(files[0].type)) { e.preventDefault(); setArt(c, files[0]); }
+  });
+
+  boot();
+})();
+</script>
