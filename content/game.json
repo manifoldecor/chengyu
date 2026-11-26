@@ -1,0 +1,31 @@
+{
+  "_help": "Game settings. Edit the numbers, save, and the game reloads. Rarities: common, uncommon, rare, epic, legendary. Cards live in content/cards, art in content/art (see content/README.md).",
+
+  "dailyPack": "basic",
+  "pityLimit": 30,
+  "idleCapHours": 8,
+
+  "inkValue": { "common": 5, "uncommon": 12, "rare": 30, "epic": 80, "legendary": 200 },
+  "idleInkPerHour": { "common": 1, "uncommon": 2, "rare": 4, "epic": 8, "legendary": 15 },
+
+  "streakBonuses": [
+    { "every": 7, "ink": 50 },
+    { "every": 14, "ink": 120 },
+    { "every": 30, "ink": 300 }
+  ],
+
+  "packs": [
+    {
+      "id": "basic", "name": "Basic Pack", "cost": 0,
+      "weights": { "common": 60, "uncommon": 25, "rare": 10, "epic": 4, "legendary": 1 }
+    },
+    {
+      "id": "silver", "name": "Silver Pack", "cost": 80,
+      "weights": { "common": 30, "uncommon": 35, "rare": 22, "epic": 10, "legendary": 3 }
+    },
+    {
+      "id": "gold", "name": "Gold Pack", "cost": 250,
+      "weights": { "common": 0, "uncommon": 30, "rare": 42, "epic": 22, "legendary": 6 }
+    }
+  ]
+}

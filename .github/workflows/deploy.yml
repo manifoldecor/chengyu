@@ -1,0 +1,40 @@
+name: Publish game and content
+
+# Every push to the main branch checks the content, builds the game, and publishes everything to GitHub Pages.
+# Editing a card file (or adding art) and pushing is all it takes to update the live game: players fetch the new content
+# the next time they open it.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test          # fails the publish if a card file or game.json has a problem
+      - run: npm run build     # bundles /content into dist/content/ and builds the game
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
