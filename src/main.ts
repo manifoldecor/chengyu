@@ -7,6 +7,7 @@ import { Card, PullResult, RARITIES } from './game/types';
 import { PackStage } from './fx/stage';
 import { RARITY_HEX } from './fx/textures';
 import { sfx } from './fx/audio';
+import { CardViewer } from './fx/viewer';
 
 const state = load();
 let tab: 'home' | 'collection' | 'shop' = 'home';
@@ -41,6 +42,7 @@ function startReveal(res: PullResult) {
 
 function render() {
   stage?.dispose(); stage = null;
+  if (viewerEl && tab !== 'collection') closeViewer();
   if (state.pending && !CARDS.some(c => c.id === state.pending!.cardId)) { state.pending = null; persist(); }   // that card was removed from the online content
   if (tab === 'home') ensureDailyPending();
   app.innerHTML = `
@@ -66,6 +68,7 @@ function render() {
     if (res) startReveal(res); else { toast = 'Not enough ink'; render(); }
   });
   if (tab === 'home' && state.pending) mountStage();
+  app.querySelectorAll<HTMLElement>('[data-card]').forEach(b => b.onclick = () => openViewer(b.dataset.card!));
   document.getElementById('continue')?.addEventListener('click', () => { toast = ''; render(); });
 }
 
@@ -108,15 +111,58 @@ function home() {
 
 const thumb = (c: Card) => c.art ? `<img class="art" src="${esc(c.art)}" data-fallback="${esc(c.monster)}" alt="">` : `<div class="m">${esc(c.monster)}</div>`;
 
+const sortedCards = () => [...CARDS].sort((x, y) => RARITIES.indexOf(x.rarity) - RARITIES.indexOf(y.rarity));
+
 function collection() {
   const owned = CARDS.filter(c => state.owned[c.id]).length;
-  const sorted = [...CARDS].sort((a, b) => RARITIES.indexOf(a.rarity) - RARITIES.indexOf(b.rarity));
-  return `<p>${owned} / ${CARDS.length} collected</p><div class="grid">${sorted.map(c => {
+  return `<p>${owned} / ${CARDS.length} collected</p><p class="dim" style="margin-top:-6px">Tap a card to look at it up close.</p><div class="grid">${sortedCards().map(c => {
     const n = state.owned[c.id];
-    return `<div class="mini ${n ? '' : 'locked'}" style="--c:${RARITY_HEX[c.rarity]}">
+    return `<button type="button" class="mini ${n ? '' : 'locked'}" data-card="${esc(c.id)}" style="--c:${RARITY_HEX[c.rarity]}" aria-label="${n ? esc(c.text) : 'Undiscovered ' + c.rarity + ' card'}">
       ${n ? thumb(c) : '<div class="m">❓</div>'}<div class="t hanzi">${n ? esc(c.text) : '？？？？'}</div>
-      <div class="s">${n ? `×${n} · ${c.rarity}` : c.rarity}</div></div>`;
+      <div class="s">${n ? `×${n} · ${c.rarity}` : c.rarity}</div></button>`;
   }).join('')}</div>`;
+}
+
+/* ---------- card viewer (opens from the collection) ---------- */
+let viewer: CardViewer | null = null;
+let viewerEl: HTMLElement | null = null;
+let viewerIdx = 0;
+
+function openViewer(id: string) {
+  const list = sortedCards(); viewerIdx = Math.max(0, list.findIndex(c => c.id === id));
+  if (!viewerEl) {
+    viewerEl = document.createElement('div'); viewerEl.className = 'viewer';
+    viewerEl.setAttribute('role', 'dialog'); viewerEl.setAttribute('aria-modal', 'true'); viewerEl.setAttribute('aria-label', 'Card viewer');
+    viewerEl.innerHTML = `<button class="vclose" type="button" aria-label="Close">✕</button>
+      <button class="vnav prev" type="button" aria-label="Previous card">‹</button><button class="vnav next" type="button" aria-label="Next card">›</button>
+      <div class="vstage"></div><div class="vinfo" aria-live="polite"></div>`;
+    document.body.appendChild(viewerEl); document.body.classList.add('noscroll');
+    viewerEl.querySelector('.vclose')!.addEventListener('click', closeViewer);
+    viewerEl.querySelector('.prev')!.addEventListener('click', () => stepViewer(-1));
+    viewerEl.querySelector('.next')!.addEventListener('click', () => stepViewer(1));
+    viewerEl.addEventListener('click', e => { if (e.target === viewerEl) closeViewer(); });
+    document.addEventListener('keydown', viewerKeys);
+  }
+  showViewerCard();
+}
+function stepViewer(d: number) { const n = sortedCards().length; viewerIdx = (viewerIdx + d + n) % n; showViewerCard(); }
+function showViewerCard() {
+  if (!viewerEl) return;
+  const c = sortedCards()[viewerIdx], n = state.owned[c.id] ?? 0, host = viewerEl.querySelector<HTMLElement>('.vstage')!;
+  viewer?.dispose(); viewer = new CardViewer(host, c, n > 0);
+  const tags = c.tags.length ? `<div class="vtags">${c.tags.map(t => `<span>${esc(t)}</span>`).join('')}</div>` : '';
+  viewerEl.querySelector('.vinfo')!.innerHTML = n > 0
+    ? `<div class="vname">${esc(c.name)}</div><div class="vmeta" style="color:${RARITY_HEX[c.rarity]}"><b>${c.rarity}</b> · you own ×${n} · a duplicate recycles for ${INK_VALUE[c.rarity]} ink</div>
+       ${c.story ? `<p class="vstory">${esc(c.story)}</p>` : ''}${tags}<div class="vhint">Drag to turn it · tap to flip · ← → for the next card</div>`
+    : `<div class="vname">Not discovered yet</div><div class="vmeta" style="color:${RARITY_HEX[c.rarity]}"><b>${c.rarity}</b> card</div>
+       <p class="vstory">Open packs to find it${c.price ? `, or buy it in the Shop for ${c.price} ink` : ''}.</p><div class="vhint">← → for the next card</div>`;
+}
+function viewerKeys(e: KeyboardEvent) {
+  if (e.key === 'Escape') closeViewer(); else if (e.key === 'ArrowLeft') stepViewer(-1); else if (e.key === 'ArrowRight') stepViewer(1);
+}
+function closeViewer() {
+  document.removeEventListener('keydown', viewerKeys);
+  viewer?.dispose(); viewer = null; viewerEl?.remove(); viewerEl = null; document.body.classList.remove('noscroll');
 }
 
 function shop() {

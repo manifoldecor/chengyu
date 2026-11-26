@@ -11,7 +11,7 @@ import { GLYPHS, crackMaskTexture, makeCrackMaterial, pillowZ, talismanTexture }
 import { SealCloth } from './cloth';
 
 interface RarityFx { color: number; burst: number; shake: number; rays: number; bloom: number; rings: number; foil: number; }
-const FX: Record<Rarity, RarityFx> = {
+export const FX: Record<Rarity, RarityFx> = {
   common:    { color: 0xffe2a0, burst: 90,  shake: 0,    rays: 0,   bloom: 0.5, rings: 1, foil: 0 },
   uncommon:  { color: 0x6bdc74, burst: 180, shake: 0.02, rays: 0.25, bloom: 0.8, rings: 1, foil: 0 },
   rare:      { color: 0x4aa3ff, burst: 300, shake: 0.04, rays: 0.45, bloom: 1.0, rings: 2, foil: 0.3 },
@@ -72,7 +72,7 @@ class Particles {
 }
 
 // ───────────────────────── shaders ─────────────────────────
-const FOIL_FRAG = /* glsl */`
+export const FOIL_FRAG = /* glsl */`
   uniform vec2 uTilt; uniform float uTime, uStrength; varying vec2 vUv;
   float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   vec3 hue(float x){ return clamp(abs(mod(x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0); }
@@ -85,7 +85,7 @@ const FOIL_FRAG = /* glsl */`
     float a = uStrength * (0.05 + sheen * 0.8) + tw * uStrength * 0.8;
     gl_FragColor = vec4(rainbow * a + vec3(tw * uStrength), a);
   }`;
-const RAYS_FRAG = /* glsl */`
+export const RAYS_FRAG = /* glsl */`
   uniform float uTime, uAlpha; uniform vec3 uColor; varying vec2 vUv;
   void main(){
     vec2 p = vUv - 0.5; float r = length(p), a = atan(p.y, p.x);
@@ -93,7 +93,7 @@ const RAYS_FRAG = /* glsl */`
     float c = (rays * smoothstep(0.5, 0.02, r) + exp(-r * 8.0) * 0.8) * uAlpha;
     gl_FragColor = vec4(uColor * c, c);
   }`;
-const VERT = /* glsl */`varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+export const VERT = /* glsl */`varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
 
 interface Shard { mesh: THREE.Mesh; vel: THREE.Vector3; spin: THREE.Vector3; age: number }
 type State = 'idle' | 'charging' | 'tearing' | 'waitFlip' | 'flipping' | 'revealed';
