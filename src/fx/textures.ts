@@ -136,28 +136,44 @@ export function cardBackTexture(rarity: Rarity): THREE.CanvasTexture {
   return tex(c);
 }
 
-export function packTexture(): THREE.CanvasTexture {
+export interface PackLook { name?: string; icon?: string; color?: string }
+const hexRgb = (h: string) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+const mixRgb = (a: number[], b: number[], t: number) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+const rgba = (c: number[], a = 1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+
+/** The foil pack: the house crimson by default, or the colour, emoji and name of a custom pack. */
+export function packTexture(look: PackLook = {}): THREE.CanvasTexture {
   const c = canvas(), g = c.getContext('2d')!;
+  const custom = !!(look.icon || look.color);
+  const base = hexRgb(look.color && /^#[0-9a-f]{6}$/i.test(look.color) ? look.color : '#a3261c');
+  const mid = custom ? mixRgb(base, [0, 0, 0], 0.32) : [110, 19, 15], low = custom ? mixRgb(base, [0, 0, 0], 0.64) : [58, 9, 8];
+  const glow = custom ? mixRgb(base, [255, 190, 90], 0.6) : [255, 190, 90];
+  const gold = custom ? rgba(mixRgb(base, [246, 213, 138], 0.78)) : '#f6d58a';
   const bg = g.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, '#a3261c'); bg.addColorStop(0.5, '#6e130f'); bg.addColorStop(1, '#3a0908');
+  bg.addColorStop(0, rgba(base)); bg.addColorStop(0.5, rgba(mid)); bg.addColorStop(1, rgba(low));
   g.fillStyle = bg; g.fillRect(0, 0, W, H);
   // waves
   g.strokeStyle = 'rgba(255,210,120,.16)'; g.lineWidth = 3;
   for (let y = 360; y < H + 60; y += 34) for (let x = (y / 34) % 2 ? 0 : 36; x < W + 72; x += 72)
     for (let r = 12; r <= 32; r += 10) { g.beginPath(); g.arc(x, y, r, Math.PI, 0); g.stroke(); }
-  // glow behind title
+  // glow behind the emblem
   const rg = g.createRadialGradient(W / 2, 470, 10, W / 2, 470, 340);
-  rg.addColorStop(0, 'rgba(255,190,90,.55)'); rg.addColorStop(1, 'rgba(255,190,90,0)');
+  rg.addColorStop(0, rgba(glow, 0.55)); rg.addColorStop(1, rgba(glow, 0));
   g.fillStyle = rg; g.fillRect(0, 100, W, 760);
   g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.font = `420px ${HANZI}`; g.fillStyle = '#f6d58a'; g.shadowColor = '#ffb030'; g.shadowBlur = 40;
-  g.fillText('妖', W / 2, 480); g.shadowBlur = 0;
-  g.font = `110px ${HANZI}`; g.fillText('成语', W / 2, 760);
-  g.font = `600 34px ${SANS}`; g.fillStyle = '#f6d58a';
-  g.fillText('M O N S T E R   P A C K', W / 2, 860);
-  g.font = `28px ${SANS}`; g.fillStyle = 'rgba(246,213,138,.7)'; g.fillText('1 CARD · DAILY', W / 2, 912);
+  g.shadowColor = rgba(glow); g.shadowBlur = 40;
+  if (look.icon) { g.font = `300px ${EMOJI}`; g.fillText(look.icon, W / 2, 470); }
+  else { g.font = `420px ${HANZI}`; g.fillStyle = gold; g.fillText('妖', W / 2, 480); }
+  g.shadowBlur = 0;
+  // title: the pack's name, shrunk to fit the pack
+  const title = (look.name && look.name.trim()) || '成语', cjk = /[\u3400-\u9fff]/.test(title);
+  let size = cjk ? 110 : 92; const face = (s: number) => (cjk ? `${s}px ${HANZI}` : `700 ${s}px ${SANS}`);
+  g.font = face(size); while (g.measureText(title).width > 600 && size > 34) { size -= 4; g.font = face(size); }
+  g.fillStyle = gold; g.fillText(title, W / 2, 760);
+  g.font = `600 34px ${SANS}`; g.fillText(custom ? 'C A R D   P A C K' : 'M O N S T E R   P A C K', W / 2, 860);
+  g.font = `28px ${SANS}`; g.fillStyle = custom ? gold : 'rgba(246,213,138,.7)'; g.fillText(custom ? '1 CARD' : '1 CARD · DAILY', W / 2, 912);
   // border
-  g.strokeStyle = '#f6d58a'; g.lineWidth = 8; g.strokeRect(40, 150, W - 80, H - 300);
+  g.strokeStyle = gold; g.lineWidth = 8; g.strokeRect(40, 150, W - 80, H - 300);
   g.lineWidth = 2; g.strokeRect(58, 168, W - 116, H - 336);
   // crimped edges
   g.fillStyle = 'rgba(0,0,0,.28)';

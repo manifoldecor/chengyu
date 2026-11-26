@@ -22,6 +22,10 @@ export function rollRarity(weights: Record<Rarity, number>, rng: () => number): 
 
 /** The cards a pack can give: no shop-exclusive cards, and only matching tags when the pack is themed. */
 export function poolFor(pack: PackDef, cards: Card[] = CARDS): Card[] {
+  if (pack.cards?.length) {                      // hand-picked: exactly these cards (even shop-only ones, because you chose them)
+    const listed = cards.filter(c => pack.cards!.includes(c.id));
+    if (listed.length) return listed;
+  }
   const normal = cards.filter(c => !c.exclusive);
   const themed = pack.tags?.length ? normal.filter(c => c.tags.some(t => pack.tags!.includes(t))) : normal;
   return themed.length ? themed : normal.length ? normal : cards;

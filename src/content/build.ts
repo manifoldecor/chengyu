@@ -117,9 +117,15 @@ export function parseConfig(raw: unknown, problems: string[]): GameConfig {
     ids.add(id);
     const weights = perRarity(p.weights, { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 }, `packs[${i}].weights`, problems);
     if (RARITIES.every(r => weights[r] === 0)) { problems.push(`game.json: pack "${id}" has no drop weights - skipped`); ids.delete(id); continue; }
+    const color = typeof p.color === 'string' && /^#[0-9a-f]{6}$/i.test(p.color.trim()) ? p.color.trim() : undefined;
+    if (p.color !== undefined && !color) problems.push(`game.json: pack "${id}" has a colour that isn't like "#a3261e" - ignored`);
+    const icon = typeof p.icon === 'string' && p.icon.trim() ? p.icon.trim().slice(0, 8) : undefined;
+    const description = typeof p.description === 'string' && p.description.trim() ? p.description.trim().slice(0, 160) : undefined;
+    const cards = Array.isArray(p.cards) ? (p.cards as unknown[]).map(x => String(x)).filter(Boolean) : [];
     cfg.packs.push({
-      id, name: typeof p.name === 'string' ? p.name : id, cost: num(p.cost, 0, `packs[${i}].cost`, problems), weights,
-      ...(Array.isArray(p.tags) ? { tags: (p.tags as unknown[]).map(t => String(t).toLowerCase()) } : {}),
+      id, name: typeof p.name === 'string' && p.name.trim() ? p.name.trim() : id, cost: num(p.cost, 0, `packs[${i}].cost`, problems), weights,
+      ...(Array.isArray(p.tags) && p.tags.length ? { tags: (p.tags as unknown[]).map(t => String(t).toLowerCase()) } : {}),
+      ...(cards.length ? { cards } : {}), ...(icon ? { icon } : {}), ...(color ? { color } : {}), ...(description ? { description } : {}),
     });
   }
   if (!cfg.packs.length) { problems.push('game.json: no valid packs, using the built-in basic pack'); cfg.packs = DEFAULT_CONFIG.packs; }
@@ -148,5 +154,13 @@ export function buildContent(cardFiles: Record<string, string>, artFiles: Record
   if (cards.length && !droppable.length) problems.push('Every card is "exclusive", so packs have nothing to give.');
   for (const p of config.packs) if (p.tags?.length && !droppable.some(c => c.tags.some(t => p.tags!.includes(t))))
     problems.push(`game.json: pack "${p.id}" is limited to tags [${p.tags.join(', ')}] but no card has them - it will use all cards`);
+  const known = new Set(cards.map(c => c.id));
+  for (const p of config.packs) {
+    if (!p.cards) continue;
+    const missing = p.cards.filter(id => !known.has(id));
+    for (const id of missing) problems.push(`game.json: pack "${p.id}" lists the card "${id}" which doesn't exist - skipped`);
+    p.cards = p.cards.filter(id => known.has(id));
+    if (!p.cards.length) delete p.cards;
+  }
   return { cards, config, problems };
 }

@@ -5,7 +5,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { Card, RARITIES, Rarity } from '../game/types';
-import { cardBackTexture, cardFrontTexture, packTexture, spriteTexture } from './textures';
+import { PackLook, cardBackTexture, cardFrontTexture, packTexture, spriteTexture } from './textures';
 import { haptic, sfx } from './audio';
 import { GLYPHS, crackMaskTexture, makeCrackMaterial, pillowZ, talismanTexture } from './seals';
 import { SealCloth } from './cloth';
@@ -99,7 +99,7 @@ interface Shard { mesh: THREE.Mesh; vel: THREE.Vector3; spin: THREE.Vector3; age
 type State = 'idle' | 'charging' | 'tearing' | 'waitFlip' | 'flipping' | 'revealed';
 interface Tween { t: number; dur: number; fn: (k: number) => void; ease: (k: number) => number; done: () => void; }
 
-export interface StageOpts { auto?: boolean; onRevealed?: () => void; }
+export interface StageOpts { auto?: boolean; pack?: PackLook; onRevealed?: () => void; }
 
 export class PackStage {
   private renderer: THREE.WebGLRenderer;
@@ -209,7 +209,7 @@ export class PackStage {
   }
 
   private buildPack() {
-    const map = packTexture();
+    const map = packTexture(this.opts.pack);
     const mk = () => {
       const m = new THREE.MeshPhysicalMaterial({
         map, metalness: 0.55, roughness: 0.4, clearcoat: 0.6, clearcoatRoughness: 0.25, envMap: this.env, envMapIntensity: 0.7,

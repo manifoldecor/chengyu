@@ -19,7 +19,14 @@ export interface SaveData {
   pity: number;                    // packs since last epic+
   lastIdle: number;                // epoch ms
   /** A pack that has been rolled but not yet shown to the player (survives reloads, prevents re-rolling). */
-  pending?: { cardId: string; isNew: boolean; inkGained: number; bonus: number } | null;
+  pending?: { cardId: string; isNew: boolean; inkGained: number; bonus: number; packId?: string } | null;
 }
-export interface PackDef { id: string; name: string; cost: number; weights: Record<Rarity, number>; tags?: string[]; }
+export interface PackDef {
+  id: string; name: string; cost: number; weights: Record<Rarity, number>;
+  tags?: string[];          // draw only from cards with one of these tags
+  cards?: string[];         // or draw only from these hand-picked cards (ids)
+  icon?: string;            // emoji shown on the pack
+  color?: string;           // "#rrggbb" pack colour
+  description?: string;     // one line shown in the shop
+}
 export interface PullResult { card: Card; isNew: boolean; inkGained: number; }

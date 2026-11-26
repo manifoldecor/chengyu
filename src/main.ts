@@ -1,5 +1,6 @@
 import { CONTENT } from './content';
 import { CARDS, DAILY_PACK, INK_VALUE, PACKS } from './game/packs';
+import type { PackDef } from './game/types';
 import { buyCard, buyPack, collectIdle, idleRate, openPack } from './game/economy';
 import { canClaimDaily, claimDaily } from './game/daily';
 import { load, save } from './game/save';
@@ -30,13 +31,13 @@ function ensureDailyPending() {
   const bonus = claimDaily(state, new Date());
   const res = openPack(state, DAILY_PACK);
   state.ink += bonus;
-  state.pending = { cardId: res.card.id, isNew: res.isNew, inkGained: res.inkGained, bonus };
+  state.pending = { cardId: res.card.id, isNew: res.isNew, inkGained: res.inkGained, bonus, packId: DAILY_PACK.id };
   persist();
 }
 
 /** A shop purchase has been rolled: show it on the stage, opening automatically. */
-function startReveal(res: PullResult) {
-  state.pending = { cardId: res.card.id, isNew: res.isNew, inkGained: res.inkGained, bonus: 0 };
+function startReveal(res: PullResult, packId?: string) {
+  state.pending = { cardId: res.card.id, isNew: res.isNew, inkGained: res.inkGained, bonus: 0, packId };
   persist(); tab = 'home'; toast = ''; autoNext = true; render(); sfx.coin();
 }
 
@@ -60,7 +61,7 @@ function render() {
   app.querySelectorAll<HTMLElement>('[data-buy]').forEach(b => b.onclick = () => {
     if (state.pending) { toast = 'Open your current pack first!'; tab = 'home'; render(); return; }
     const res = buyPack(state, b.dataset.buy!);
-    if (res) startReveal(res); else { toast = 'Not enough ink'; render(); }
+    if (res) startReveal(res, b.dataset.buy!); else { toast = 'Not enough ink'; render(); }
   });
   app.querySelectorAll<HTMLElement>('[data-buycard]').forEach(b => b.onclick = () => {
     if (state.pending) { toast = 'Open your current pack first!'; tab = 'home'; render(); return; }
@@ -79,11 +80,15 @@ function problemsBanner() {
     <ul>${CONTENT.problems.map(p => `<li>${esc(p)}</li>`).join('')}</ul></details>`;
 }
 
+/** A pack with its own icon or colour wears it; the house pack keeps the classic crimson look. */
+const packLook = (p: PackDef) => (p.icon || p.color ? { name: p.name, icon: p.icon, color: p.color } : undefined);
+
 function mountStage() {
   const p = state.pending!, card = cardById(p.cardId);
   const host = document.getElementById('stage')!;
   // a pack bought in the shop opens itself; the free daily pack is hold-to-open
-  stage = new PackStage(host, card, { auto: autoNext, onRevealed: () => revealed(p) });
+  const pack = PACKS.find(x => x.id === p.packId) ?? DAILY_PACK;   // a pack removed from game.json falls back to the daily look
+  stage = new PackStage(host, card, { auto: autoNext, pack: packLook(pack), onRevealed: () => revealed(p) });
   autoNext = false;
 }
 
@@ -170,9 +175,13 @@ function shop() {
     const total = RARITIES.reduce((s, x) => s + p.weights[x], 0);
     return +(p.weights[r] / total * 100).toFixed(1);
   };
-  const packs = PACKS.filter(p => p.cost > 0).map(p => `
-    <div class="shop-row"><span>${esc(p.name)}<br><small>${RARITIES.filter(r => p.weights[r] > 0).map(r => `${r}: ${pct(p, r)}%`).join(' · ')}</small></span>
-    <button class="btn" data-buy="${esc(p.id)}" ${state.ink < p.cost ? 'disabled' : ''}>🖋️ ${p.cost}</button></div>`).join('');
+  const packs = PACKS.filter(p => p.cost > 0).map(p => {
+    const theme = p.cards?.length ? `Hand-picked: ${p.cards.length} cards` : p.tags?.length ? `Theme: ${p.tags.map(esc).join(', ')}` : '';
+    return `<div class="shop-row pack" style="--pc:${p.color ?? '#c0392b'}"><span class="pk-ico" aria-hidden="true">${esc(p.icon ?? '📦')}</span>
+      <span class="pk-body"><b>${esc(p.name)}</b>${p.description ? `<br><span class="pk-desc">${esc(p.description)}</span>` : ''}${theme ? `<br><span class="pk-theme">${theme}</span>` : ''}
+      <br><small>${RARITIES.filter(r => p.weights[r] > 0).map(r => `${r}: ${pct(p, r)}%`).join(' · ')}</small></span>
+      <button class="btn" data-buy="${esc(p.id)}" ${state.ink < p.cost ? 'disabled' : ''}>🖋️ ${p.cost}</button></div>`;
+  }).join('');
   const unique = CARDS.filter(c => c.price).map(c => {
     const owned = !!state.owned[c.id];
     return `<div class="shop-row" style="border-color:${RARITY_HEX[c.rarity]}66"><span class="hanzi" style="font-size:20px">${esc(c.text)}</span>

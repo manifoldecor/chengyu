@@ -127,6 +127,35 @@
   .msgs.bad { color:var(--bad); } .msgs.warn { color:var(--warn); }
   .btnrow { display:flex; gap:8px; flex-wrap:wrap; }
 
+  .tabs { display:inline-flex; background:var(--surface2); border-radius:10px; padding:3px; gap:2px; }
+  .tabs button { border:0; background:transparent; padding:6px 16px; border-radius:8px; font-weight:500; cursor:pointer; }
+  .tabs button[aria-pressed="true"] { background:var(--surface); box-shadow:0 1px 3px var(--shadow); font-weight:600; }
+  .gallery.packs { grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); }
+  .ptile { --pc:#a3261e; appearance:none; border:0; cursor:pointer; position:relative; aspect-ratio:3/4; border-radius:12px; padding:20px 12px 16px; color:#f6e3b8; display:grid; grid-template-rows:auto 1fr auto auto; justify-items:center; align-items:center; gap:8px; overflow:hidden;
+    background:linear-gradient(155deg, var(--pc), color-mix(in srgb, var(--pc) 42%, #000)); box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--pc) 35%, #f6d58a), 0 8px 20px -10px var(--pc); transition:transform .12s; text-align:center; }
+  .ptile::before, .ptile::after { content:""; position:absolute; left:0; right:0; height:9px; background:repeating-linear-gradient(90deg, rgba(0,0,0,.3) 0 2px, transparent 2px 5px); }
+  .ptile::before { top:0; } .ptile::after { bottom:0; }
+  .ptile:hover { transform:translateY(-3px); } .ptile.static:hover { transform:none; }
+  .ptile[aria-current="true"] { box-shadow:0 0 0 3px var(--bg), 0 0 0 5px var(--pc); }
+  .ptile .tag { font-size:11px; font-weight:700; background:rgba(0,0,0,.38); padding:2px 9px; border-radius:999px; }
+  .ptile .ico { font-size:54px; line-height:1; } .ptile .pn { font-weight:600; font-size:14px; line-height:1.2; }
+  .ptile .pdesc { font-size:11.5px; opacity:.85; line-height:1.3; }
+  .ptile.add { background:transparent; color:var(--muted); box-shadow:none; border:2px dashed var(--line); align-content:center; grid-template-rows:auto auto; font-weight:500; }
+  .ptile.add::before, .ptile.add::after { display:none; } .ptile.add:hover { color:var(--fg); border-color:var(--fg); }
+  .ptile.static { max-width:190px; width:100%; margin-inline:auto; cursor:default; }
+  .oddsbar { display:flex; height:6px; border-radius:99px; overflow:hidden; background:rgba(0,0,0,.28); width:100%; min-width:40px; } .oddsbar i { display:block; min-width:0; }
+  .swatches { display:flex; gap:8px; flex-wrap:wrap; } .sw { width:26px; height:26px; border-radius:50%; border:2px solid transparent; cursor:pointer; box-shadow:inset 0 0 0 1px rgba(0,0,0,.25); }
+  .sw[aria-pressed="true"] { border-color:var(--fg); }
+  .in.colorin { padding:2px 4px; height:40px; cursor:pointer; }
+  .odds { display:grid; gap:8px; }
+  .odds-row { display:grid; grid-template-columns:10px 76px minmax(0,1fr) 64px 48px; gap:8px; align-items:center; font-size:13px; }
+  .odds-row input[type="range"] { width:100%; accent-color:var(--accent); } .in.num { padding:5px 7px; text-align:right; } .pct { color:var(--muted); font-size:12px; text-align:right; }
+  .seg3 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+  .seg3 button { border:1px solid var(--line); background:var(--bg); border-radius:9px; padding:8px 4px; cursor:pointer; font-size:12.5px; font-weight:500; }
+  .seg3 button[aria-pressed="true"] { border-color:var(--fg); background:var(--surface2); font-weight:600; }
+  .picklist { max-height:200px; overflow:auto; border:1px solid var(--line); border-radius:9px; background:var(--bg); display:grid; }
+  .pick { display:grid; grid-template-columns:auto 10px auto minmax(0,1fr); gap:8px; align-items:center; padding:6px 10px; cursor:pointer; border-bottom:1px solid var(--line); }
+  .pick:last-child { border-bottom:0; } .pick:hover { background:var(--surface2); } .pick .hz { font-family:var(--hanzi); font-size:16px; } .pick .hint { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   /* publish sheet + setup */
   .scrim { position:fixed; inset:0; background:rgba(10,8,7,.55); z-index:30; display:grid; place-items:center; padding:16px; }
   .sheet { background:var(--surface); border:1px solid var(--line); border-radius:16px; width:min(560px,100%); max-height:min(88vh,100%); overflow:auto; padding:20px; display:grid; gap:14px; box-shadow:0 30px 80px -20px var(--shadow); }
@@ -148,7 +177,7 @@
   .toast { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(18px + env(safe-area-inset-bottom, 0px)); background:var(--fg); color:var(--bg); padding:9px 16px; border-radius:999px; font-size:13px; font-weight:500;
     opacity:0; pointer-events:none; transition:opacity .2s; z-index:60; max-width:92vw; text-align:center; }
   .toast.on { opacity:1; }
-  @media (max-width:720px) { .two { grid-template-columns:minmax(0,1fr); } .seg { grid-template-columns:repeat(3,minmax(0,1fr)); } .gallery { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); } }
+  @media (max-width:720px) { .odds-row { grid-template-columns:10px 64px minmax(0,1fr) 56px; } .odds-row .pct { display:none; } .two { grid-template-columns:minmax(0,1fr); } .seg { grid-template-columns:repeat(3,minmax(0,1fr)); } .gallery { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); } }
   @media (prefers-reduced-motion: reduce) { .drawer, .toast, .tile, .wrap { transition:none; } ol.steps li.run .ic { animation:none; } }
 </style>
 
@@ -157,6 +186,7 @@
 <div class="wrap">
   <header class="bar">
     <div class="brand"><span class="cn" aria-hidden="true">卡坊</span><b>Card Workshop</b></div>
+    <div class="tabs" id="tabs" role="group" aria-label="View" hidden></div>
     <span class="folder" id="folder" hidden></span>
     <button class="btn primary" id="publish" type="button" hidden>Publish</button>
   </header>
@@ -169,6 +199,7 @@
 <div class="toast" id="toast" role="status"></div>
 
 <script type="application/json" id="seed">[]</script>
+<script type="application/json" id="seedcfg">{}</script>
 <script>
 (function () {
   'use strict';
@@ -276,7 +307,7 @@
   var S = {
     mode: 'boot',            // boot | setup | desktop | manual
     desktop: null, root: '', owner: '', repo: '', cards: [], sel: null, filter: { q: '', r: '' },
-    changed: {}, removed: [], busy: false, saveT: {}, seedCards: null
+    changed: {}, removed: [], busy: false, saveT: {}, seedCards: null, view: 'cards', cfg: null, cfgError: '', cfgBaseText: null, cfgChanged: false, selPack: null, seedCfg: null, packT: 0
   };
   var cur = function () { return S.cards.filter(function (c) { return c.uid === S.sel; })[0] || null; };
   var siteUrl = function () { return S.owner ? 'https://' + S.owner + '.github.io/' + S.repo + '/' : 'https://manifoldecor.github.io/chengyu/'; };
@@ -324,6 +355,13 @@
       }
       return { cards: cards, bad: bad };
     },
+    async loadConfig() {
+      var fsx = S.desktop.fs, p = D.path('content/game.json');
+      if (!(await fsx.exists(p))) return cfgDefault();
+      var text = await fsx.readFile(p, 'utf8');
+      return normCfg(JSON.parse(text.replace(/^\uFEFF/, '')));
+    },
+    async saveConfig() { await S.desktop.fs.writeFile(D.path('content/game.json'), cfgText(), 'utf8'); },
     async saveCard(c) {
       await S.desktop.fs.mkdir(D.path('content/cards'), { recursive: true });
       c.file = c.file || c.id;
@@ -346,13 +384,14 @@
     },
     /** What differs from what is already on GitHub, from git itself. */
     async refreshChanges() {
-      var r = await D.exec('git -c core.quotepath=off status --porcelain -- content'), ch = {}, rem = [];
+      var r = await D.exec('git -c core.quotepath=off status --porcelain -- content'), ch = {}, rem = [], cfgDirty = false;
       r.stdout.split(/\r?\n/).forEach(function (ln) {
         if (!ln.trim()) return; var code = ln.slice(0, 2), p = ln.slice(3).replace(/^"|"$/g, ''), m;
+        if (p === 'content/game.json') { cfgDirty = true; return; }
         if ((m = /^content\/cards\/([^/]+)\.md$/.exec(p))) { if (m[1][0] === '_') return; if (/D/.test(code)) rem.push(m[1]); else (ch[m[1]] = ch[m[1]] || {}).card = /\?|A/.test(code) ? 'new' : 'edited'; }
         else if ((m = /^content\/art\/([^/]+)\.[^./]+$/.exec(p))) { (ch[m[1].toLowerCase()] = ch[m[1].toLowerCase()] || {}).art = /D/.test(code) ? 'removed' : 'changed'; }
       });
-      S.changed = ch; S.removed = rem; renderAll();
+      S.changed = ch; S.removed = rem; S.cfgChanged = cfgDirty; renderAll();
     }
   };
   var refreshT = 0;
@@ -374,8 +413,8 @@
     return statusOf(c) !== 'published';
   }
   function changedCount() {
-    if (S.mode === 'desktop') { var ids = Object.keys(S.changed).length + S.removed.length; return ids; }
-    return S.cards.filter(function (c) { return statusOf(c) !== 'published'; }).length;
+    if (S.mode === 'desktop') { return Object.keys(S.changed).length + S.removed.length + (S.cfgChanged ? 1 : 0); }
+    return S.cards.filter(function (c) { return statusOf(c) !== 'published'; }).length + (cfgChangedManual() ? 1 : 0);
   }
 
   /* ================= setup / boot ================= */
@@ -387,6 +426,7 @@
     S.desktop = desktop;
     if (desktop && desktop.app && desktop.app.dock) { try { desktop.app.dock.setIcon(drawIcon()).catch(function () {}); } catch (e) {} }
     S.seedCards = JSON.parse($('#seed').textContent);
+    try { S.seedCfg = JSON.parse($('#seedcfg').textContent); } catch (e) { S.seedCfg = {}; }
     if (desktop && desktop.fs) {
       var perm = 'unavailable'; try { perm = await desktop.permissions.state('full-access'); } catch (e) {}
       if (perm === 'granted') return connect();
@@ -422,7 +462,8 @@
       S.root = await D.findRoot();
       if (!S.root) return setupFolder('');
       await D.loadRepoInfo();
-      var r = await D.loadCards(); S.cards = r.cards; S.mode = 'desktop'; S.sel = null;
+      var r = await D.loadCards(); S.cards = r.cards; S.mode = 'desktop'; S.sel = null; S.selPack = null;
+      try { S.cfg = await D.loadConfig(); S.cfgError = ''; } catch (e) { S.cfg = null; S.cfgError = 'The file couldn\'t be read: ' + (e.message || e); }   // never overwrite a file we couldn't understand
       try { localStorage.setItem('card-workshop-root', S.root); } catch (e) {}
       await D.refreshChanges().catch(function () {});
       renderAll();
@@ -438,17 +479,20 @@
     S.mode = 'manual'; S.owner = ''; S.repo = '';
     S.cards = S.seedCards.map(function (s) { var c = Object.assign(blank(), s); c.file = c.id; var h = hydrate(c); h.base = clone(snap(c)); return h; });
     try { var raw = localStorage.getItem('card-workshop-manual'); if (raw) { var saved = JSON.parse(raw); if (Array.isArray(saved) && saved.length) S.cards = saved.map(function (c) { var h = hydrate(c); h.art = null; return h; }); } } catch (e) {}
-    S.sel = null; renderAll();
+    S.sel = null; S.selPack = null;
+    var baseCfg = normCfg(clone(S.seedCfg && S.seedCfg.packs ? S.seedCfg : cfgDefault())); S.cfgBaseText = cfgTextOf(baseCfg); S.cfg = baseCfg;
+    try { var rc = localStorage.getItem('card-workshop-manual-cfg'); if (rc) S.cfg = normCfg(JSON.parse(rc)); } catch (e) {}
+    renderAll();
   }
   var manT = 0;
   function persistManual() { if (S.mode !== 'manual') return; clearTimeout(manT); manT = setTimeout(function () { try { localStorage.setItem('card-workshop-manual', JSON.stringify(S.cards.map(function (c) { var o = Object.assign({}, c); o.art = null; return o; }))); } catch (e) {} }, 300); }
 
   /* ================= gallery ================= */
   function renderAll() {
-    renderBar(); renderGallery(); if (S.sel) renderDrawer(false);
+    renderBar(); renderGallery(); if (S.view === 'packs') { if (S.selPack) renderPackDrawer(false); } else if (S.sel) renderDrawer(false);
   }
   function renderBar() {
-    var f = $('#folder'), p = $('#publish');
+    var f = $('#folder'), p = $('#publish'); renderTabs();
     if (S.mode === 'desktop') {
       f.hidden = false; f.innerHTML = '<span class="dot"></span>' + esc(S.root.split('/').pop()) + ' <button class="linkish" type="button" data-act="open-folder">Open folder</button>';
     } else if (S.mode === 'manual') {
@@ -469,6 +513,7 @@
   }
   function renderGallery() {
     if (S.mode !== 'desktop' && S.mode !== 'manual') return;
+    if (S.view === 'packs') { renderPacks(); return; }
     var chips = '<button class="chip" type="button" data-r="" aria-pressed="' + (S.filter.r === '') + '">All ' + S.cards.length + '</button>' + RAR.map(function (r) {
       return '<button class="chip" type="button" data-r="' + r.k + '" aria-pressed="' + (S.filter.r === r.k) + '"><span class="dot" style="--dot:var(--c-' + r.k + ')"></span>' + r.n + '</button>'; }).join('');
     var tiles = visibleCards().map(function (c) {
@@ -491,7 +536,7 @@
 
   /* ================= drawer (editing) ================= */
   function openCard(u) { S.sel = u; document.body.classList.add('drawer-open'); $('#drawer').setAttribute('aria-hidden', 'false'); renderDrawer(true); renderGallery(); }
-  function closeDrawer() { S.sel = null; document.body.classList.remove('drawer-open'); $('#drawer').setAttribute('aria-hidden', 'true'); renderGallery(); }
+  function closeDrawer() { S.sel = null; S.selPack = null; document.body.classList.remove('drawer-open'); $('#drawer').setAttribute('aria-hidden', 'true'); renderGallery(); }
 
   function saveLine(c) {
     var v = validate(c, S.cards);
@@ -578,6 +623,7 @@
     } catch (e) { say('Couldn\'t read that picture: ' + (e.message || e)); return false; }
   }
   async function dropFiles(files, target) {
+    if (S.view === 'packs') { say('Pictures go on cards. Switch to the Cards tab first.'); return; }
     var imgs = Array.prototype.filter.call(files, function (f) { return /^image\//.test(f.type) || /\.(png|jpe?g|webp|gif|svg)$/i.test(f.name); });
     if (!imgs.length) return;
     if (S.mode !== 'desktop' && S.mode !== 'manual') { say('Open a card first.'); return; }
@@ -619,8 +665,10 @@
         rows.push({ hz: c ? c.text : id, id: id, what: what.join(' + ') || 'changed' });
       });
       S.removed.forEach(function (id) { rows.push({ hz: id, id: id, what: 'removed' }); });
+      if (S.cfgChanged) rows.push({ hz: 'Packs', id: 'game.json', what: 'pack settings' });
     } else {
       S.cards.forEach(function (c) { var st = statusOf(c); if (st !== 'published') rows.push({ hz: c.text || c.id, id: c.id, what: st === 'new' ? 'new card' : st === 'deleted' ? 'removed' : 'edited' }); });
+      if (cfgChangedManual()) rows.push({ hz: 'Packs', id: 'game.json', what: 'pack settings' });
     }
     return rows;
   }
@@ -684,6 +732,7 @@
       else h += lnk(gh('delete/main/content/cards/' + encodeURIComponent(c.id) + '.md'), 'Delete on GitHub', true);
       h += '<button class="btn small" type="button" data-act="mark" data-uid="' + c.uid + '">I committed it</button></div></li>'; return h;
     }).join('');
+    if (cfgChangedManual()) items += '<li><div><b>Packs</b> <span class="hint">content/game.json · edited</span></div><div class="btnrow"><button class="btn small" type="button" data-pact="copy-cfg">Copy game.json</button>' + lnk(gh('edit/main/content/game.json'), 'Edit on GitHub', true) + '<button class="btn small" type="button" data-pact="mark-cfg">I committed it</button></div></li>';
     $('#sheet').innerHTML = '<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="Publish changes"><h2>Publish ' + rows.length + (rows.length === 1 ? ' change' : ' changes') + '</h2>' +
       '<p class="hint">Direct publishing isn\'t set up, so GitHub\'s own pages finish the job. Each link opens with your card already filled in: press <b>Commit changes</b> there.</p><ul class="changes" style="gap:14px">' + items + '</ul>' +
       '<div class="btnrow"><button class="btn" type="button" data-act="cancel">Close</button><button class="btn small" type="button" data-act="setup">Set up direct publishing</button></div></div></div>';
@@ -733,7 +782,7 @@
   });
   document.addEventListener('change', function (e) { if (e.target.id === 'art-file') { var c = cur(); if (c && e.target.files.length) { dropFiles(e.target.files, c); } e.target.value = ''; } });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && !S.busy) { if ($('#sheet').innerHTML) $('#sheet').innerHTML = ''; else if (S.sel) closeDrawer(); }
+    if (e.key === 'Escape' && !S.busy) { if ($('#sheet').innerHTML) $('#sheet').innerHTML = ''; else if (S.sel || S.selPack) closeDrawer(); }
     if ((e.key === 'Enter' || e.key === ' ') && e.target.id === 'dz') { e.preventDefault(); var f = $('#art-file'); if (f) f.click(); }
   });
   document.addEventListener('click', function (e) { if (e.target.closest('#dz') && !e.target.closest('input')) { var f = $('#art-file'); if (f) f.click(); } });
@@ -758,6 +807,233 @@
   document.addEventListener('paste', function (e) {
     var files = e.clipboardData && e.clipboardData.files; if (!files || !files.length) return;
     var c = cur(); if (c && /^image\//.test(files[0].type)) { e.preventDefault(); setArt(c, files[0]); }
+  });
+
+  /* ================= packs (customizing the packs players open and buy) ================= */
+  var PACK_COLORS = ['#a3261e', '#c0561a', '#b8860b', '#2f7a4a', '#1f6f8b', '#3a4fa3', '#6b3fa0', '#a33a7a', '#444b52'];
+  var PACK_ICONS = ['📦', '🎁', '🐉', '🐲', '🔥', '🌙', '⭐', '🍀', '💎', '🌸', '🏮', '🎴', '🐯', '🦊', '🐢', '🌊'];
+  var PRESETS = [
+    { n: 'Everyday', w: { common: 60, uncommon: 25, rare: 10, epic: 4, legendary: 1 } },
+    { n: 'Better', w: { common: 30, uncommon: 35, rare: 22, epic: 10, legendary: 3 } },
+    { n: 'Premium', w: { common: 0, uncommon: 30, rare: 42, epic: 22, legendary: 6 } },
+    { n: 'Jackpot', w: { common: 0, uncommon: 0, rare: 40, epic: 40, legendary: 20 } }
+  ];
+  function cfgDefault() { return normCfg({ dailyPack: 'basic', packs: [{ id: 'basic', name: 'Basic Pack', cost: 0, weights: clone(PRESETS[0].w) }] }); }
+  function normCfg(c) {
+    c = c && typeof c === 'object' ? c : {};
+    if (!Array.isArray(c.packs)) c.packs = [];
+    c.packs = c.packs.map(function (p) {
+      var w = {}; RAR.forEach(function (r) { var v = Number(p.weights && p.weights[r.k]); w[r.k] = isFinite(v) && v > 0 ? v : 0; });
+      var o = { uid: uid(), saved: true, id: String(p.id || ''), name: String(p.name || p.id || ''), cost: isFinite(Number(p.cost)) ? Math.max(0, Math.round(Number(p.cost))) : 0, weights: w };
+      if (p.icon) o.icon = String(p.icon); if (p.color) o.color = String(p.color); if (p.description) o.description = String(p.description);
+      if (Array.isArray(p.tags) && p.tags.length) o.tags = p.tags.map(String);
+      if (Array.isArray(p.cards) && p.cards.length) o.cards = p.cards.map(String);
+      o.mode = o.cards ? 'cards' : (o.tags ? 'tags' : 'all');   // which "what can come out" choice is showing (not saved to the file)
+      return o;
+    });
+    if (!c.dailyPack || !c.packs.some(function (p) { return p.id === c.dailyPack; })) c.dailyPack = c.packs[0] ? c.packs[0].id : 'basic';
+    return c;
+  }
+  function packOut(p) {
+    var o = { id: p.id, name: p.name.trim() };
+    if (p.icon) o.icon = p.icon; if (p.color) o.color = p.color; if (p.description && p.description.trim()) o.description = p.description.trim();
+    o.cost = p.cost; o.weights = p.weights;
+    if (p.tags && p.tags.length) o.tags = p.tags; if (p.cards && p.cards.length) o.cards = p.cards;
+    return o;
+  }
+  /** game.json as it will be written: every other setting untouched, packs rewritten, half-finished new packs left out. */
+  function cfgTextOf(c) {
+    var o = {}; Object.keys(c).forEach(function (k) { if (k !== 'packs') o[k] = c[k]; });
+    o.packs = c.packs.filter(function (p) { return p.saved || !packValidate(p, c).errors.length; }).map(packOut);
+    return JSON.stringify(o, null, 2) + '\n';
+  }
+  var cfgText = function () { return cfgTextOf(S.cfg); };
+  function cfgChangedManual() { return S.mode === 'manual' && S.cfg && S.cfgBaseText != null && cfgText() !== S.cfgBaseText; }
+  async function saveCfg() {
+    if (S.mode === 'desktop') await D.saveConfig();
+    else { try { localStorage.setItem('card-workshop-manual-cfg', cfgText()); } catch (e) {} }
+  }
+
+  function slug(s) { return String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || ''; }
+  function uniquePackId(base, except) {
+    var id = base || 'pack', n = 2; while (S.cfg.packs.some(function (p) { return p.uid !== except && p.id === id; })) id = (base || 'pack') + '-' + (n++);
+    return base ? id : '';
+  }
+  var sumW = function (p) { return RAR.reduce(function (t, r) { return t + (p.weights[r.k] || 0); }, 0); };
+  var pctOf = function (p, k) { var t = sumW(p); return t ? Math.round((p.weights[k] || 0) / t * 1000) / 10 : 0; };
+  /** The cards this pack can give, worked out the same way the game does it. */
+  function poolOf(p, cards) {
+    var cs = (cards || S.cards).filter(function (c) { return c.id && c.text && !c.deleted; });
+    if (p.cards && p.cards.length) { var l = cs.filter(function (c) { return p.cards.indexOf(c.id) >= 0; }); if (l.length) return l; }
+    var normal = cs.filter(function (c) { return !c.exclusive; });
+    if (p.tags && p.tags.length) { var t = normal.filter(function (c) { return tagList(c.tags).some(function (x) { return p.tags.indexOf(x) >= 0; }); }); if (t.length) return t; }
+    return normal.length ? normal : cs;
+  }
+  function packValidate(p, cfg) {
+    cfg = cfg || S.cfg; var e = [], w = [];
+    if (!p.name.trim()) e.push('Give the pack a name.');
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(p.id)) e.push('The pack needs an ID (it comes from the name).');
+    else if (cfg.packs.some(function (o) { return o.uid !== p.uid && o.id === p.id; })) e.push('Another pack already has the ID "' + p.id + '".');
+    if (sumW(p) <= 0) e.push('Give at least one rarity a chance above 0.');
+    if (!(p.cost >= 0) || p.cost !== Math.round(p.cost)) e.push('The cost must be a whole number, 0 or more.');
+    var pool = poolOf(p), daily = cfg.dailyPack === p.id;
+    if (!pool.length) e.push('There are no cards for this pack to give yet.');
+    if (!daily && p.cost === 0) w.push('A free pack only shows up as the daily pack. Give it a cost to sell it in the shop.');
+    RAR.forEach(function (r) { if ((p.weights[r.k] || 0) > 0 && pool.length && !pool.some(function (c) { return c.rarity === r.k; })) w.push('This pack has no ' + r.k + ' cards, so the game gives the nearest rarity instead.'); });
+    if (p.cards && p.cards.length && S.cards.length && !p.cards.some(function (id) { return S.cards.some(function (c) { return c.id === id; }); })) w.push('None of the chosen cards exist any more, so the whole collection is used.');
+    return { errors: e, warns: w };
+  }
+
+  function oddsBar(p) {
+    return '<span class="oddsbar" aria-hidden="true">' + RAR.map(function (r) { return p.weights[r.k] > 0 ? '<i style="flex:' + p.weights[r.k] + ';background:var(--c-' + r.k + ')"></i>' : ''; }).join('') + '</span>';
+  }
+  function packFace(p, big) {
+    var daily = S.cfg.dailyPack === p.id, col = /^#[0-9a-f]{6}$/i.test(p.color || '') ? p.color : '#a3261e';
+    return '<span class="tag">' + (daily ? 'Daily · free' : '🖋️ ' + p.cost) + '</span><span class="ico">' + esc(p.icon || '📦') + '</span><span class="pn">' + esc(p.name || 'Unnamed pack') + '</span>' + oddsBar(p) +
+      (big && p.description ? '<span class="pdesc">' + esc(p.description) + '</span>' : '');
+  }
+  function renderTabs() {
+    var t = $('#tabs'), on = S.mode === 'desktop' || S.mode === 'manual'; t.hidden = !on; if (!on) return;
+    t.innerHTML = ['cards', 'packs'].map(function (v) { return '<button type="button" data-view="' + v + '" aria-pressed="' + (S.view === v) + '">' + (v === 'cards' ? 'Cards' : 'Packs') + '</button>'; }).join('');
+  }
+  function renderPacks() {
+    if (!S.cfg) { $('#main').innerHTML = '<div class="center"><h1>game.json has a mistake</h1><p>' + esc(S.cfgError || '') + '</p><p class="hint">Nothing was changed. Fix the file (or restore it from GitHub) and reopen the workshop.</p></div>'; return; }
+    var tiles = S.cfg.packs.map(function (p) {
+      var col = /^#[0-9a-f]{6}$/i.test(p.color || '') ? p.color : '#a3261e';
+      return '<button type="button" class="ptile" data-pid="' + p.uid + '" aria-current="' + (p.uid === S.selPack) + '" style="--pc:' + col + '">' + packFace(p, false) + '</button>';
+    }).join('');
+    $('#main').innerHTML = '<div class="toolbar"><p class="hint" style="flex:1">Packs are what players open and buy. Set a pack\'s look, its odds, and which cards can come out of it.</p></div>' +
+      '<div class="gallery packs" id="gallery">' + tiles + '<button type="button" class="ptile add" data-pact="new"><span style="font-size:30px;line-height:1">+</span><span>New pack</span></button></div>';
+  }
+  var cur2 = function () { return S.cfg ? S.cfg.packs.filter(function (p) { return p.uid === S.selPack; })[0] || null : null; };
+  function openPackDrawer(u) { S.selPack = u; S.sel = null; document.body.classList.add('drawer-open'); $('#drawer').setAttribute('aria-hidden', 'false'); renderPackDrawer(true); renderPacks(); }
+
+  function allTags() { var seen = {}; S.cards.forEach(function (c) { tagList(c.tags).forEach(function (t) { seen[t] = 1; }); }); (cur2() && cur2().tags || []).forEach(function (t) { seen[t] = 1; }); return Object.keys(seen).sort(); }
+  function renderPackDrawer(full) {
+    var p = cur2(), d = $('#drawer'); if (!p) { d.innerHTML = ''; return; }
+    if (!full) { renderPackLive(p); return; }
+    var mode = p.mode || 'all', daily = S.cfg.dailyPack === p.id, onlyOne = S.cfg.packs.length <= 1;
+    var sw = PACK_COLORS.map(function (c) { return '<button type="button" class="sw" data-pcolor="' + c + '" aria-label="Colour ' + c + '" aria-pressed="' + ((p.color || '').toLowerCase() === c) + '" style="background:' + c + '"></button>'; }).join('');
+    var ic = PACK_ICONS.map(function (m) { return '<button type="button" data-picon="' + m + '" aria-label="Use ' + m + '">' + m + '</button>'; }).join('');
+    var odds = RAR.map(function (r) {
+      return '<div class="odds-row"><span class="dot" style="--dot:var(--c-' + r.k + ')"></span><label for="w-' + r.k + '">' + r.n + '</label><input type="range" id="w-' + r.k + '" data-pw="' + r.k + '" min="0" max="100" value="' + Math.min(100, p.weights[r.k]) + '">' +
+        '<input class="in num" type="number" data-pw="' + r.k + '" min="0" value="' + p.weights[r.k] + '" aria-label="' + r.n + ' weight"><span class="pct" data-pct="' + r.k + '"></span></div>'; }).join('');
+    var presets = PRESETS.map(function (x, i) { return '<button type="button" class="chip" data-ppreset="' + i + '">' + x.n + '</button>'; }).join('');
+    var modes = [['all', 'All cards'], ['tags', 'Cards with a tag'], ['cards', 'Hand-picked cards']].map(function (m) { return '<button type="button" data-pmode="' + m[0] + '" aria-pressed="' + (mode === m[0]) + '">' + m[1] + '</button>'; }).join('');
+    var inside = '';
+    if (mode === 'tags') {
+      var tg = allTags();
+      inside = tg.length ? '<div class="chips">' + tg.map(function (t) { return '<button type="button" class="chip" data-ptag="' + esc(t) + '" aria-pressed="' + ((p.tags || []).indexOf(t) >= 0) + '">' + esc(t) + '</button>'; }).join('') + '</div><span class="hint">Cards need one of the chosen tags. Add tags to cards on the Cards tab.</span>'
+                  : '<span class="hint">No card has a tag yet. Add tags (for example "dragon") to cards on the Cards tab, then pick them here.</span>';
+    } else if (mode === 'cards') {
+      inside = '<input class="in" type="search" data-psearch placeholder="Search cards" aria-label="Search cards">' +
+        '<div class="picklist">' + S.cards.filter(function (c) { return c.id && c.text; }).sort(function (a, b) { return RAR.map(function (r) { return r.k; }).indexOf(a.rarity) - RAR.map(function (r) { return r.k; }).indexOf(b.rarity); }).map(function (c) {
+          return '<label class="pick" data-hay="' + esc((c.text + ' ' + c.name + ' ' + c.id).toLowerCase()) + '"><input type="checkbox" data-pcard="' + esc(c.id) + '"' + ((p.cards || []).indexOf(c.id) >= 0 ? ' checked' : '') + '><span class="dot" style="--dot:var(--c-' + c.rarity + ')"></span><span class="hz">' + esc(c.text) + '</span><span class="hint">' + esc(c.name || c.id) + (c.exclusive ? ' · shop only' : '') + '</span></label>'; }).join('') + '</div>';
+    }
+    d.innerHTML = '<div class="head"><h2>' + (p.saved ? 'Edit pack' : 'New pack') + '</h2><span class="savestate" id="savestate"></span><button class="x" type="button" data-act="close" aria-label="Close">×</button></div>' +
+      '<div class="body"><div class="stage"><div class="ptile static" id="packprev"></div></div>' +
+      '<div class="field"><label for="pk-name">Name</label><input class="in" id="pk-name" data-pf="name" value="' + esc(p.name) + '" placeholder="Dragon Pack" autocomplete="off"></div>' +
+      '<div class="field"><label for="pk-desc">One-line description <span class="hint">(shown in the shop)</span></label><input class="in" id="pk-desc" data-pf="description" value="' + esc(p.description || '') + '" placeholder="Only dragons and their friends" autocomplete="off"></div>' +
+      '<div class="field"><span class="lab">Look</span><div class="two"><div class="field"><label for="pk-icon" class="hint">Emoji on the pack</label><input class="in" id="pk-icon" data-pf="icon" value="' + esc(p.icon || '') + '" autocomplete="off"></div>' +
+      '<div class="field"><label for="pk-color" class="hint">Colour</label><input class="in colorin" id="pk-color" type="color" data-pf="color" value="' + (/^#[0-9a-f]{6}$/i.test(p.color || '') ? p.color : '#a3261e') + '"></div></div>' +
+      '<div class="emojis">' + ic + '</div><div class="swatches">' + sw + '</div></div>' +
+      '<div class="field"><span class="lab">Price</span><div class="two"><div class="field"><label for="pk-cost" class="hint">Cost in ink</label><input class="in" id="pk-cost" type="number" min="0" data-pf="cost" value="' + p.cost + '"' + (daily ? ' disabled' : '') + '></div>' +
+      '<label class="check" style="align-self:end"><input type="checkbox" data-pact="daily"' + (daily ? ' checked disabled' : '') + '><span><b>The free daily pack</b><br><span class="hint">' + (daily ? 'This is the daily pack. Tick another pack to change it.' : 'Players open this one for free each day.') + '</span></span></label></div></div>' +
+      '<div class="field"><span class="lab">Chances</span><div class="odds">' + odds + '</div><div class="chips" aria-label="Presets"><span class="hint" style="align-self:center">Start from</span>' + presets + '</div><span class="hint" id="oddsnote"></span></div>' +
+      '<div class="field"><span class="lab">What can come out</span><div class="seg3" role="group">' + modes + '</div>' + inside + '<span class="hint" id="poolnote"></span></div>' +
+      '<div id="pmsgs"></div><div class="btnrow"><button class="btn danger small" type="button" data-pact="remove"' + '>' + (p.saved ? 'Remove pack' : 'Discard draft') + '</button></div>' +
+      (onlyOne ? '<span class="hint">This is your only pack, so it can\'t be removed.</span>' : '') + '</div>';
+    renderPackLive(p);
+  }
+  function setPackSave(cls, text) { var el = $('#savestate'); if (el) { el.className = 'savestate ' + cls; el.textContent = text; } }
+  /** Everything in the drawer that reflects the numbers, without rebuilding the inputs you are typing in. */
+  function renderPackLive(p) {
+    var col = /^#[0-9a-f]{6}$/i.test(p.color || '') ? p.color : '#a3261e', pv = $('#packprev');
+    if (pv) { pv.style.setProperty('--pc', col); pv.innerHTML = packFace(p, true); }
+    RAR.forEach(function (r) { var el = $('[data-pct="' + r.k + '"]'); if (el) el.textContent = pctOf(p, r.k) + '%'; });
+    var eu = (p.weights.epic || 0) + (p.weights.legendary || 0), t = sumW(p), on = $('#oddsnote');
+    if (on) on.textContent = t ? (eu ? 'About 1 pack in ' + Math.max(1, Math.round(t / eu)) + ' has an epic or legendary card.' : 'This pack never gives epic or legendary cards.') : '';
+    var pool = poolOf(p), pn = $('#poolnote');
+    if (pn) pn.textContent = pool.length + ' card' + (pool.length === 1 ? '' : 's') + ' can come out: ' + RAR.map(function (r) { var n = pool.filter(function (c) { return c.rarity === r.k; }).length; return n ? n + ' ' + r.k : ''; }).filter(Boolean).join(' · ') + '.';
+    var v = packValidate(p), m = $('#pmsgs');
+    if (m) m.innerHTML = (v.errors.length ? '<ul class="msgs bad">' + v.errors.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') + (v.warns.length ? '<ul class="msgs warn">' + v.warns.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '');
+  }
+  function touchedPack(p, immediate) {
+    renderPackLive(p); renderBar();
+    var v = packValidate(p);
+    if (v.errors.length) { setPackSave('bad', 'Not saved yet: ' + v.errors[0]); renderPacks(); return; }
+    setPackSave('', S.mode === 'desktop' ? 'Saving…' : '');
+    clearTimeout(S.packT);
+    S.packT = setTimeout(async function () {
+      try { p.saved = true; await saveCfg(); setPackSave(S.mode === 'desktop' ? 'ok' : '', S.mode === 'desktop' ? '✓ Saved in your project folder' : ''); scheduleRefresh(); }
+      catch (e) { say('Couldn\'t save: ' + (e.message || e)); }
+      renderPacks(); renderBar();
+    }, immediate ? 0 : 500);
+  }
+  function newPack() {
+    if (!S.cfg) return; var n = S.cfg.packs.length;
+    var p = normCfg({ packs: [{ id: '', name: '', cost: 100, icon: '🎁', color: PACK_COLORS[(n + 1) % PACK_COLORS.length], weights: clone(PRESETS[1].w) }] }).packs[0]; p.saved = false;
+    S.cfg.packs.push(p); openPackDrawer(p.uid); setTimeout(function () { var el = $('#pk-name'); if (el) el.focus(); }, 60);
+  }
+  var packRemoveArmed = 0;
+  async function removePack(p) {
+    var btn = $('#drawer [data-pact="remove"]');
+    if (!p.saved) { S.cfg.packs = S.cfg.packs.filter(function (x) { return x !== p; }); closeDrawer(); say('Draft discarded.'); renderBar(); return; }
+    if (S.cfg.dailyPack === p.id) { say('This is the daily pack. Open another pack and tick "The free daily pack" first.'); return; }
+    if (S.cfg.packs.length <= 1) { say('You need at least one pack.'); return; }
+    if (packRemoveArmed !== p.uid) { packRemoveArmed = p.uid; if (btn) btn.textContent = 'Click again: remove ' + p.name + ' from the game'; setTimeout(function () { if (packRemoveArmed === p.uid) { packRemoveArmed = 0; if (btn) btn.textContent = 'Remove pack'; } }, 4000); return; }
+    packRemoveArmed = 0; S.cfg.packs = S.cfg.packs.filter(function (x) { return x !== p; });
+    try { await saveCfg(); } catch (e) { say('Couldn\'t save: ' + (e.message || e)); return; }
+    closeDrawer(); scheduleRefresh(); renderBar(); say('Pack removed. Publish to remove it from the game.');
+  }
+  function makeDaily(p) {
+    var old = S.cfg.packs.filter(function (x) { return x.id === S.cfg.dailyPack; })[0], note = '';
+    S.cfg.dailyPack = p.id; p.cost = 0;
+    if (old && old !== p && old.cost === 0) { old.cost = 60; note = ' ' + old.name + ' now costs 60 ink so it can be sold in the shop.'; }
+    renderPackDrawer(true); touchedPack(p, true); if (note) say(p.name + ' is now the free daily pack.' + note);
+  }
+
+  document.addEventListener('click', async function (e) {
+    var t = e.target.closest('[data-view],[data-pid],[data-pact],[data-picon],[data-pcolor],[data-ppreset],[data-pmode],[data-ptag]'); if (!t) return;
+    var p = cur2();
+    if (t.dataset.view) { if (S.view !== t.dataset.view) { S.view = t.dataset.view; closeDrawer(); renderAll(); } return; }
+    if (t.dataset.pid) { openPackDrawer(t.dataset.pid); return; }
+    if (t.dataset.pact === 'new') { newPack(); return; }
+    if (t.dataset.pact === 'copy-cfg') { try { await navigator.clipboard.writeText(cfgText()); say('game.json copied. Paste it into GitHub\'s editor.'); } catch (err) { say('Couldn\'t copy it here.'); } return; }
+    if (t.dataset.pact === 'mark-cfg') { S.cfgBaseText = cfgText(); renderBar(); openPublishAgain(); return; }
+    if (!p) return;
+    if (t.dataset.pact === 'remove') { removePack(p); return; }
+    if (t.dataset.pact === 'daily') return;   // handled by the checkbox's change event
+    if (t.dataset.picon) { p.icon = t.dataset.picon; var ie = $('#pk-icon'); if (ie) ie.value = p.icon; touchedPack(p); return; }
+    if (t.dataset.pcolor) { p.color = t.dataset.pcolor; var ce = $('#pk-color'); if (ce) ce.value = p.color; $('#drawer').querySelectorAll('[data-pcolor]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.pcolor === p.color)); }); touchedPack(p); return; }
+    if (t.dataset.ppreset !== undefined) { p.weights = clone(PRESETS[Number(t.dataset.ppreset)].w); renderPackDrawer(true); touchedPack(p, true); return; }
+    if (t.dataset.pmode) {
+      var m = t.dataset.pmode; p.mode = m; if (m === 'all') { delete p.tags; delete p.cards; } else if (m === 'tags') { delete p.cards; p.tags = p.tags || []; } else { delete p.tags; p.cards = p.cards || []; }
+      var tmp = p; renderPackDrawer(true); $('#drawer').querySelectorAll('[data-pmode]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.pmode === m)); }); touchedPack(tmp, true); return;
+    }
+    if (t.dataset.ptag) { var tg = t.dataset.ptag; p.tags = p.tags || []; var i = p.tags.indexOf(tg); if (i >= 0) p.tags.splice(i, 1); else p.tags.push(tg); t.setAttribute('aria-pressed', String(i < 0)); if (!p.tags.length) delete p.tags; touchedPack(p); }
+  });
+  document.addEventListener('input', function (e) {
+    var t = e.target, p = cur2(); if (!p) return;
+    if (t.dataset.pf) {
+      var f = t.dataset.pf, v = t.value;
+      if (f === 'cost') { p.cost = v === '' ? NaN : Number(v); }
+      else if (f === 'name') { p.name = v; if (!p.saved) { p.id = uniquePackId(slug(v), p.uid); } }
+      else p[f] = v;
+      if (f === 'color') $('#drawer').querySelectorAll('[data-pcolor]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.pcolor === (v || '').toLowerCase())); });
+      touchedPack(p); return;
+    }
+    if (t.dataset.pw) {
+      var k = t.dataset.pw, n = Math.max(0, Number(t.value) || 0); p.weights[k] = n;
+      $('#drawer').querySelectorAll('[data-pw="' + k + '"]').forEach(function (el) { if (el !== t) el.value = el.type === 'range' ? Math.min(100, n) : n; });
+      touchedPack(p); return;
+    }
+    if (t.dataset.psearch !== undefined) { var q = t.value.trim().toLowerCase(); $('#drawer').querySelectorAll('.pick').forEach(function (el) { el.hidden = !!q && el.dataset.hay.indexOf(q) < 0; }); }
+  });
+  document.addEventListener('change', function (e) {
+    var t = e.target, p = cur2(); if (!p) return;
+    if (t.dataset.pcard !== undefined) { p.cards = p.cards || []; var id = t.dataset.pcard, i = p.cards.indexOf(id); if (t.checked && i < 0) p.cards.push(id); else if (!t.checked && i >= 0) p.cards.splice(i, 1); touchedPack(p); }
+    else if (t.dataset.pact === 'daily' && t.checked) makeDaily(p);
   });
 
   boot();

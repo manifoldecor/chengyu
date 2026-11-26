@@ -51,8 +51,14 @@ To use a different name, add `art: my-picture.png` to the card file.
 
 ## Change the game: `game.json`
 
-* `packs`: each pack has a `cost` (0 = free) and `weights` (the chance of each rarity; they are
-  relative, so they don't have to add up to 100). Add `"tags": ["dragon"]` to make a themed pack.
+* `packs`: the packs players open and buy. **The easiest way is the Packs tab in the Card Workshop**
+  (add, edit and remove packs there). In the file, each pack has:
+  * `id`, `name`, `cost` (ink; 0 = free, which only makes sense for the daily pack) and `weights`
+    (the chance of each rarity; they are relative, so they don't have to add up to 100).
+  * Optional look: `icon` (an emoji), `color` (like `"#1f6f8b"`) and `description` (one line for the shop).
+    A pack with an icon or colour wears it on the 3D pack you open.
+  * Optional contents: `"tags": ["dragon"]` draws only from cards with that tag, or `"cards": ["yghl", "pdjn"]`
+    draws only from those hand-picked cards (even shop-only ones).
 * `dailyPack`: which pack is the free daily one.
 * `inkValue`: ink you get for recycling a duplicate, per rarity.
 * `idleInkPerHour`, `idleCapHours`: passive income from owned cards.
