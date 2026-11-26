@@ -33,7 +33,7 @@ jobs:
       - run: npm test          # fails the publish if a card file or game.json has a problem
       - run: npm run build     # bundles /content into dist/content/ and builds the game
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
       - id: deployment
