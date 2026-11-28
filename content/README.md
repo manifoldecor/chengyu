@@ -35,6 +35,7 @@ Anything after the **first blank line** is the card's story text.
 | `pinyin`, `meaning`, `name` | Shown on the card. `name` is the monster's name |
 | `monster` | An emoji used until you add real art |
 | `art` | Picture file name in `art/` (optional, see below) |
+| `sprite` | Name of a cut-out sprite from `sprites/` to use as the picture (see Sprites) |
 | `tags` | Words like `dragon, animal`. Packs can be limited to tags |
 | `price` | Makes the card buyable in the Shop for that much ink |
 | `exclusive: yes` | The card never drops from packs, only the Shop sells it |
@@ -48,6 +49,24 @@ Put an image in `art/` named after the card's file name: `ye-gong.md` -> `art/ye
 `png`, `jpg`, `webp`, `gif`, `svg` and `avif` all work. A portrait-ish or square picture is best,
 it fills the picture area of the card. If a picture isn't there, the emoji is used.
 To use a different name, add `art: my-picture.png` to the card file.
+
+## Sprites: cut-out pictures to reuse
+
+A **sprite** is a picture with a transparent background (a monster, an emblem) saved once in `sprites/` and
+used by any card or pack. The easiest way to make them is the **Sprites** tab in the Card Workshop:
+
+1. Drop a **sprite sheet**: one picture with several sprites on a plain background.
+2. It finds the background colour and makes it transparent, then finds each separate sprite. If one sprite
+   splits into pieces, raise *Keep pieces together*; if two got joined, lower it. Drag on the picture to draw a
+   box around anything it missed.
+3. Name each sprite and press **Save**. They land in `content/sprites/<name>.png`.
+
+Use a sprite on a card with a `sprite: slime` line (or **Choose from sprites** in the card editor). It is shown
+whole, with room around it. Priority for a card's picture: an explicit `art:` file, then `sprite:`, then a
+file in `art/` named after the card.
+
+Packs can use one too: **Choose a sprite** in the pack editor (`"sprite": "fox"` in `game.json`), or give the
+pack its own picture, saved as `content/packs/<pack id>.png`.
 
 ## Change the game: `game.json`
 

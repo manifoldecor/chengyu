@@ -50,7 +50,7 @@ const writable = p => { const r = safe(p, CONTENT); if (r === CONTENT) throw fai
 /* ---------- the only commands that may run ---------- */
 const FIXED = {
   'git remote get-url origin': ['git', 'remote', 'get-url', 'origin'],
-  'git -c core.quotepath=off status --porcelain -- content': ['git', '-c', 'core.quotepath=off', 'status', '--porcelain', '--', 'content'],
+  'git -c core.quotepath=off status --porcelain -uall -- content': ['git', '-c', 'core.quotepath=off', 'status', '--porcelain', '-uall', '--', 'content'],
   'git add -A -- content': ['git', 'add', '-A', '--', 'content'],
   'git config user.name': ['git', 'config', 'user.name'],
   'git config user.email': ['git', 'config', 'user.email'],

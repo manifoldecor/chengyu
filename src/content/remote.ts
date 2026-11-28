@@ -5,6 +5,7 @@ import type { ContentSource } from './index';
 export interface Manifest {
   schema: 1; version: string; generatedAt?: string;
   config: unknown; cards: Record<string, string>; art: Record<string, string>;
+  sprites?: Record<string, string>; packImages?: Record<string, string>;   // newer manifests; older saved copies simply lack them
 }
 
 const CACHE_KEY = 'chengyu-content-cache-v1';
@@ -15,7 +16,8 @@ const isRecordOfStrings = (v: unknown): v is Record<string, string> =>
 export function isManifest(x: unknown): x is Manifest {
   const m = x as Manifest;
   return !!m && m.schema === 1 && typeof m.version === 'string' && !!m.config && typeof m.config === 'object'
-    && isRecordOfStrings(m.cards) && isRecordOfStrings(m.art);
+    && isRecordOfStrings(m.cards) && isRecordOfStrings(m.art)
+    && (m.sprites === undefined || isRecordOfStrings(m.sprites)) && (m.packImages === undefined || isRecordOfStrings(m.packImages));
 }
 
 /** Turn a downloaded manifest into game content. Art paths in the manifest are relative to where it was fetched from. */
@@ -23,7 +25,10 @@ export function contentFromManifest(m: Manifest, manifestUrl: string): Content {
   const cardFiles: Record<string, string> = {}, artFiles: Record<string, string> = {};
   for (const [name, text] of Object.entries(m.cards)) cardFiles[`/content/cards/${name}`] = text;
   for (const [name, rel] of Object.entries(m.art)) artFiles[`/content/art/${name}`] = new URL(rel, manifestUrl).href;
-  return buildContent(cardFiles, artFiles, m.config);
+  const sprites: Record<string, string> = {}, packImages: Record<string, string> = {};
+  for (const [name, rel] of Object.entries(m.sprites ?? {})) sprites[`/content/sprites/${name}`] = new URL(rel, manifestUrl).href;
+  for (const [name, rel] of Object.entries(m.packImages ?? {})) packImages[`/content/packs/${name}`] = new URL(rel, manifestUrl).href;
+  return buildContent(cardFiles, artFiles, m.config, { sprites, packImages });
 }
 
 export interface Deps {

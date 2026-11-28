@@ -81,7 +81,7 @@ function problemsBanner() {
 }
 
 /** A pack with its own icon or colour wears it; the house pack keeps the classic crimson look. */
-const packLook = (p: PackDef) => (p.icon || p.color ? { name: p.name, icon: p.icon, color: p.color } : undefined);
+const packLook = (p: PackDef) => (p.icon || p.color || p.image ? { name: p.name, icon: p.icon, color: p.color, image: p.image } : undefined);
 
 function mountStage() {
   const p = state.pending!, card = cardById(p.cardId);
@@ -114,7 +114,7 @@ function home() {
     <p class="dim">Spend ink in the Shop for packs with better odds.</p>`;
 }
 
-const thumb = (c: Card) => c.art ? `<img class="art" src="${esc(c.art)}" data-fallback="${esc(c.monster)}" alt="">` : `<div class="m">${esc(c.monster)}</div>`;
+const thumb = (c: Card) => c.art ? `<img class="art" style="object-fit:${c.artFit === 'contain' ? 'contain;padding:8%' : 'cover'}" src="${esc(c.art)}" data-fallback="${esc(c.monster)}" alt="">` : `<div class="m">${esc(c.monster)}</div>`;
 
 const sortedCards = () => [...CARDS].sort((x, y) => RARITIES.indexOf(x.rarity) - RARITIES.indexOf(y.rarity));
 
@@ -177,7 +177,7 @@ function shop() {
   };
   const packs = PACKS.filter(p => p.cost > 0).map(p => {
     const theme = p.cards?.length ? `Hand-picked: ${p.cards.length} cards` : p.tags?.length ? `Theme: ${p.tags.map(esc).join(', ')}` : '';
-    return `<div class="shop-row pack" style="--pc:${p.color ?? '#c0392b'}"><span class="pk-ico" aria-hidden="true">${esc(p.icon ?? '📦')}</span>
+    return `<div class="shop-row pack" style="--pc:${p.color ?? '#c0392b'}"><span class="pk-ico" aria-hidden="true">${p.image ? `<img src="${esc(p.image)}" alt="">` : esc(p.icon ?? '📦')}</span>
       <span class="pk-body"><b>${esc(p.name)}</b>${p.description ? `<br><span class="pk-desc">${esc(p.description)}</span>` : ''}${theme ? `<br><span class="pk-theme">${theme}</span>` : ''}
       <br><small>${RARITIES.filter(r => p.weights[r] > 0).map(r => `${r}: ${pct(p, r)}%`).join(' · ')}</small></span>
       <button class="btn" data-buy="${esc(p.id)}" ${state.ink < p.cost ? 'disabled' : ''}>🖋️ ${p.cost}</button></div>`;

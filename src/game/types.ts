@@ -9,6 +9,8 @@ export interface Card {
   story?: string;
   price?: number;          // buyable in the shop for this much ink
   exclusive?: boolean;     // never drops from packs
+  sprite?: string;         // name of a cut-out sprite from content/sprites used as the picture
+  artFit?: 'cover' | 'contain';   // 'contain' = show the whole picture (sprites); default fills the panel
 }
 export interface SaveData {
   version: 1;
@@ -28,5 +30,7 @@ export interface PackDef {
   icon?: string;            // emoji shown on the pack
   color?: string;           // "#rrggbb" pack colour
   description?: string;     // one line shown in the shop
+  sprite?: string;          // name of a sprite from content/sprites used as the pack's picture
+  image?: string;           // resolved picture URL (the pack's own file in content/packs, or its sprite)
 }
 export interface PullResult { card: Card; isNew: boolean; inkGained: number; }

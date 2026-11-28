@@ -156,6 +156,33 @@
   .picklist { max-height:200px; overflow:auto; border:1px solid var(--line); border-radius:9px; background:var(--bg); display:grid; }
   .pick { display:grid; grid-template-columns:auto 10px auto minmax(0,1fr); gap:8px; align-items:center; padding:6px 10px; cursor:pointer; border-bottom:1px solid var(--line); }
   .pick:last-child { border-bottom:0; } .pick:hover { background:var(--surface2); } .pick .hz { font-family:var(--hanzi); font-size:16px; } .pick .hint { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .checker { background-color:var(--surface); background-image:linear-gradient(45deg, rgba(128,128,128,.22) 25%, transparent 25%, transparent 75%, rgba(128,128,128,.22) 75%), linear-gradient(45deg, rgba(128,128,128,.22) 25%, transparent 25%, transparent 75%, rgba(128,128,128,.22) 75%); background-size:16px 16px; background-position:0 0, 8px 8px; }
+  .gallery.sprites { grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); }
+  .stile { border:1px solid var(--line); border-radius:12px; background:var(--surface); padding:8px; display:grid; gap:4px; justify-items:center; text-align:center; }
+  .stile .simg { width:100%; aspect-ratio:1; border-radius:8px; display:grid; place-items:center; overflow:hidden; } .stile .simg img { max-width:92%; max-height:92%; object-fit:contain; }
+  .stile .sname { font-weight:600; font-size:13px; word-break:break-all; }
+  .h2 { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:600; margin:20px 0 4px; }
+  .spdrop { border:2px dashed var(--line); border-radius:14px; padding:22px; display:grid; gap:8px; justify-items:center; text-align:center; cursor:pointer; background:var(--surface); }
+  .spdrop:hover, .spdrop.over { border-color:var(--accent); }
+  .sheet.wide { width:min(1100px,100%); }
+  .cutgrid { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr); gap:18px; align-items:start; }
+  .cutstage { position:relative; border:1px solid var(--line); border-radius:10px; overflow:hidden; line-height:0; cursor:crosshair; touch-action:none; user-select:none; }
+  .cutstage canvas { width:100%; height:auto; display:block; } .cutstage.picking { cursor:copy; outline:2px solid var(--accent); }
+  .cutbox { position:absolute; border:2px solid var(--accent); background:color-mix(in srgb, var(--accent) 12%, transparent); pointer-events:none; } .cutbox.off { opacity:.35; border-style:dashed; }
+  .cutbox .n { position:absolute; left:0; top:0; background:var(--accent); color:var(--accent-fg); font:600 11px/1 var(--ui); padding:3px 6px; border-bottom-right-radius:6px; }
+  .cutbox .cutdel { position:absolute; right:0; top:0; pointer-events:auto; border:0; background:var(--accent); color:var(--accent-fg); width:20px; height:20px; font:700 14px/1 var(--ui); cursor:pointer; border-bottom-left-radius:6px; }
+  .cutrubber { position:absolute; border:2px dashed var(--fg); background:rgba(255,255,255,.15); pointer-events:none; }
+  .cutright { display:grid; gap:14px; align-content:start; } .bgrow { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .bgchip { display:inline-flex; gap:6px; align-items:center; font-size:12px; } .bgchip i { width:16px; height:16px; border-radius:4px; border:1px solid var(--line); display:inline-block; }
+  .cutlist { display:grid; gap:8px; max-height:260px; overflow:auto; }
+  .cutrow { display:grid; grid-template-columns:56px minmax(0,1fr) auto; gap:10px; align-items:center; } .cutrow.off { opacity:.45; }
+  .cthumb { width:56px; height:56px; border-radius:8px; display:grid; place-items:center; overflow:hidden; border:1px solid var(--line); } .cthumb img { max-width:100%; max-height:100%; object-fit:contain; }
+  .spriterow { display:grid; grid-template-columns:auto minmax(0,1fr); gap:10px; align-items:center; margin-top:8px; } .spriterow .btnrow, .spriterow > button { grid-column:1 / -1; justify-self:start; }
+  .pic-row { display:grid; gap:10px; } .pk-prev { height:120px; border-radius:10px; border:1px solid var(--line); display:grid; place-items:center; overflow:hidden; } .pk-prev img { max-width:92%; max-height:92%; object-fit:contain; }
+  .ptile .ico img, .ptile .pimg { width:64px; height:64px; object-fit:contain; }
+  .spickgrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:10px; max-height:50vh; overflow:auto; }
+  .spick { border:1px solid var(--line); background:var(--bg); border-radius:10px; padding:6px; cursor:pointer; display:grid; gap:4px; justify-items:center; font-size:12px; } .spick:hover { border-color:var(--accent); }
+  .spick .checker { width:100%; aspect-ratio:1; border-radius:6px; display:grid; place-items:center; overflow:hidden; } .spick img { max-width:90%; max-height:90%; object-fit:contain; }
   /* publish sheet + setup */
   .scrim { position:fixed; inset:0; background:rgba(10,8,7,.55); z-index:30; display:grid; place-items:center; padding:16px; }
   .sheet { background:var(--surface); border:1px solid var(--line); border-radius:16px; width:min(560px,100%); max-height:min(88vh,100%); overflow:auto; padding:20px; display:grid; gap:14px; box-shadow:0 30px 80px -20px var(--shadow); }
@@ -177,7 +204,7 @@
   .toast { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(18px + env(safe-area-inset-bottom, 0px)); background:var(--fg); color:var(--bg); padding:9px 16px; border-radius:999px; font-size:13px; font-weight:500;
     opacity:0; pointer-events:none; transition:opacity .2s; z-index:60; max-width:92vw; text-align:center; }
   .toast.on { opacity:1; }
-  @media (max-width:720px) { .odds-row { grid-template-columns:10px 64px minmax(0,1fr) 56px; } .odds-row .pct { display:none; } .two { grid-template-columns:minmax(0,1fr); } .seg { grid-template-columns:repeat(3,minmax(0,1fr)); } .gallery { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); } }
+  @media (max-width:720px) { .cutgrid { grid-template-columns:minmax(0,1fr); } .odds-row { grid-template-columns:10px 64px minmax(0,1fr) 56px; } .odds-row .pct { display:none; } .two { grid-template-columns:minmax(0,1fr); } .seg { grid-template-columns:repeat(3,minmax(0,1fr)); } .gallery { grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); } }
   @media (prefers-reduced-motion: reduce) { .drawer, .toast, .tile, .wrap { transition:none; } ol.steps li.run .ic { animation:none; } }
 </style>
 
@@ -200,6 +227,169 @@
 
 <script type="application/json" id="seed">[]</script>
 <script type="application/json" id="seedcfg">{}</script>
+<script>/*
+ * Sprite cutter: finds the background of a sprite sheet, makes it transparent, and finds each separate sprite.
+ * Plain functions on RGBA pixel arrays (no DOM), so the same file runs inside the Card Workshop page and in the tests.
+ *
+ *   estimateBackground(rgba, w, h)            -> { transparent, colors: [[r,g,b], ...] }
+ *   removeBackground(rgba, w, h, opts)        -> new RGBA with the background transparent (edges softened)
+ *   findSprites(rgba, w, h, { gap, minSize }) -> { boxes, cell, cw, lab }  (reading order)
+ *   cropSprite(rgba, w, h, box, found, pad)   -> { rgba, w, h } just that sprite, trimmed, on transparency
+ */
+(function (root) {
+  'use strict';
+
+  var dist = function (r1, g1, b1, c) { var dr = r1 - c[0], dg = g1 - c[1], db = b1 - c[2]; return Math.sqrt(dr * dr + dg * dg + db * db); };
+
+  /** Look at the picture's border: mostly see-through, or one (or two, for a fake checkerboard) solid colours. */
+  function estimateBackground(d, w, h) {
+    var buckets = {}, total = 0, clear = 0;
+    function visit(x, y) {
+      var i = (y * w + x) * 4; total++;
+      if (d[i + 3] < 128) { clear++; return; }
+      var key = ((d[i] >> 4) << 8) | ((d[i + 1] >> 4) << 4) | (d[i + 2] >> 4);
+      var b = buckets[key] || (buckets[key] = { n: 0, r: 0, g: 0, b: 0 });
+      b.n++; b.r += d[i]; b.g += d[i + 1]; b.b += d[i + 2];
+    }
+    for (var x = 0; x < w; x++) { visit(x, 0); if (h > 1) visit(x, h - 1); }
+    for (var y = 1; y < h - 1; y++) { visit(0, y); if (w > 1) visit(w - 1, y); }
+    if (clear > total * 0.5) return { transparent: true, colors: [] };
+    var list = Object.keys(buckets).map(function (k) { return buckets[k]; }).sort(function (a, b) { return b.n - a.n; });
+    if (!list.length) return { transparent: false, colors: [[255, 255, 255]] };
+    var colors = [], mean = function (b) { return [Math.round(b.r / b.n), Math.round(b.g / b.n), Math.round(b.b / b.n)]; };
+    colors.push(mean(list[0]));
+    for (var i = 1; i < list.length && colors.length < 2; i++) {            // a second solid colour that is a big share of the border = a checkerboard
+      var c = mean(list[i]);
+      if (list[i].n / total >= 0.12 && dist(c[0], c[1], c[2], colors[0]) > 24) colors.push(c);
+    }
+    return { transparent: false, colors: colors };
+  }
+
+  /**
+   * Flood-fills the background in from the picture's edges (so colour that is *inside* a sprite is kept, such as white eyes),
+   * then softens the edge so there is no halo. opts: { colors, tolerance (0-160), inside (also remove that colour inside shapes) }.
+   */
+  function removeBackground(d, w, h, opts) {
+    var n = w * h, out = new Uint8ClampedArray(d), bg = new Uint8Array(n), tol = opts.tolerance, cols = opts.colors || [];
+    function nearest(i) { var best = 1e9, bc = null; for (var k = 0; k < cols.length; k++) { var v = dist(d[i], d[i + 1], d[i + 2], cols[k]); if (v < best) { best = v; bc = cols[k]; } } return { d: best, c: bc }; }
+    function isBg(p) { var i = p * 4; if (d[i + 3] < 16) return true; return cols.length > 0 && nearest(i).d <= tol; }
+    if (cols.length || true) {
+      var stack = new Int32Array(n), sp = 0, p, x, y;
+      var seed = function (q) { if (!bg[q] && isBg(q)) { bg[q] = 1; stack[sp++] = q; } };
+      for (x = 0; x < w; x++) { seed(x); seed((h - 1) * w + x); }
+      for (y = 0; y < h; y++) { seed(y * w); seed(y * w + w - 1); }
+      while (sp) {
+        p = stack[--sp]; x = p % w; y = (p / w) | 0;
+        if (x > 0) seed(p - 1); if (x < w - 1) seed(p + 1); if (y > 0) seed(p - w); if (y < h - 1) seed(p + w);
+      }
+    }
+    if (opts.inside) for (var q = 0; q < n; q++) if (!bg[q] && isBg(q)) bg[q] = 1;
+    for (var k = 0; k < n; k++) if (bg[k]) out[k * 4 + 3] = 0;
+    // Soften the edge. A pixel touching the background is a blend of sprite colour and background colour, so: take the sprite
+    // colour from the solid pixels just inside it, work out how much of the pixel is sprite, and make the rest transparent.
+    if (cols.length) {
+      var edge = new Uint8Array(n), list = [];
+      for (var py = 0; py < h; py++) for (var px = 0; px < w; px++) {
+        var pi = py * w + px; if (bg[pi]) continue;
+        if ((px > 0 && bg[pi - 1]) || (px < w - 1 && bg[pi + 1]) || (py > 0 && bg[pi - w]) || (py < h - 1 && bg[pi + w])) { edge[pi] = 1; list.push(pi); }
+      }
+      for (var e = 0; e < list.length; e++) {
+        var p2 = list[e], i = p2 * 4, ex = p2 % w, ey = (p2 / w) | 0, nn = nearest(i), fr = 0, fg = 0, fb = 0, fn = 0;
+        for (var yy = Math.max(0, ey - 2); yy <= Math.min(h - 1, ey + 2); yy++) for (var xx = Math.max(0, ex - 2); xx <= Math.min(w - 1, ex + 2); xx++) {
+          var q2 = yy * w + xx; if (bg[q2] || edge[q2]) continue; var j = q2 * 4; fr += d[j]; fg += d[j + 1]; fb += d[j + 2]; fn++;
+        }
+        if (!fn) continue;
+        fr /= fn; fg /= fn; fb /= fn;
+        var vr = fr - nn.c[0], vg = fg - nn.c[1], vb = fb - nn.c[2], len2 = vr * vr + vg * vg + vb * vb;
+        if (len2 < 100) continue;                                       // sprite colour is about the same as the background: nothing to separate
+        var a = ((d[i] - nn.c[0]) * vr + (d[i + 1] - nn.c[1]) * vg + (d[i + 2] - nn.c[2]) * vb) / len2;
+        if (a >= 0.92) continue; if (a < 0) a = 0;
+        out[i + 3] = Math.round(d[i + 3] * a); out[i] = fr; out[i + 1] = fg; out[i + 2] = fb;
+      }
+    }
+    return out;
+  }
+
+  /** Spread each set cell by r cells in every direction (a fast box blur on 0/1 using running sums). */
+  function dilate(src, cw, ch, r) {
+    if (!r) return src.slice();
+    var tmp = new Uint8Array(cw * ch), out = new Uint8Array(cw * ch), pre = new Int32Array(Math.max(cw, ch) + 1), x, y;
+    for (y = 0; y < ch; y++) {
+      for (x = 0; x < cw; x++) pre[x + 1] = pre[x] + src[y * cw + x];
+      for (x = 0; x < cw; x++) tmp[y * cw + x] = pre[Math.min(x + r, cw - 1) + 1] - pre[Math.max(x - r, 0)] > 0 ? 1 : 0;
+    }
+    for (x = 0; x < cw; x++) {
+      for (y = 0; y < ch; y++) pre[y + 1] = pre[y] + tmp[y * cw + x];
+      for (y = 0; y < ch; y++) out[y * cw + x] = pre[Math.min(y + r, ch - 1) + 1] - pre[Math.max(y - r, 0)] > 0 ? 1 : 0;
+    }
+    return out;
+  }
+
+  /**
+   * Groups the non-transparent pixels into separate sprites. Pieces closer than `gap` pixels belong together (so a sprite
+   * with a detached sparkle stays one sprite); specks whose longest side is under `minSize` are ignored.
+   */
+  function findSprites(d, w, h, o) {
+    var gap = o.gap == null ? 6 : o.gap, minSize = o.minSize == null ? 10 : o.minSize;
+    var cell = gap <= 3 ? 1 : gap < 8 ? 2 : 4;        // the grouping grid is as fine as the join distance needs, so close-but-separate sprites aren't merged
+    var cw = Math.ceil(w / cell), ch = Math.ceil(h / cell), coarse = new Uint8Array(cw * ch), x, y;
+    for (y = 0; y < h; y++) for (x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 24) coarse[((y / cell) | 0) * cw + ((x / cell) | 0)] = 1;
+    var dil = dilate(coarse, cw, ch, Math.round(gap / cell)), lab = new Int32Array(cw * ch), count = 0, queue = new Int32Array(cw * ch);
+    for (var s = 0; s < dil.length; s++) {
+      if (!dil[s] || lab[s]) continue;
+      count++; var qh = 0, qt = 0; queue[qt++] = s; lab[s] = count;
+      while (qh < qt) {
+        var c = queue[qh++], cx = c % cw, cy = (c / cw) | 0;
+        for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) {
+          var nx = cx + dx, ny = cy + dy; if (nx < 0 || ny < 0 || nx >= cw || ny >= ch) continue;
+          var nq = ny * cw + nx; if (dil[nq] && !lab[nq]) { lab[nq] = count; queue[qt++] = nq; }
+        }
+      }
+    }
+    var boxes = []; for (var k = 1; k <= count; k++) boxes[k] = { x0: w, y0: h, x1: -1, y1: -1, pixels: 0, label: k };
+    for (y = 0; y < h; y++) for (x = 0; x < w; x++) {
+      if (d[(y * w + x) * 4 + 3] <= 24) continue;
+      var b = boxes[lab[((y / cell) | 0) * cw + ((x / cell) | 0)]];
+      if (x < b.x0) b.x0 = x; if (y < b.y0) b.y0 = y; if (x > b.x1) b.x1 = x; if (y > b.y1) b.y1 = y; b.pixels++;
+    }
+    var list = boxes.filter(function (b) { return b && b.x1 >= 0 && Math.max(b.x1 - b.x0 + 1, b.y1 - b.y0 + 1) >= minSize && b.pixels >= minSize; });
+    // reading order: rows from the top, left to right within a row
+    list.sort(function (a, b) { return a.y0 - b.y0; });
+    var rows = [];
+    list.forEach(function (b) {
+      var cy = (b.y0 + b.y1) / 2, hh = b.y1 - b.y0 + 1, row = null;
+      for (var r = 0; r < rows.length; r++) if (Math.abs(cy - rows[r].cy) < Math.max(hh, rows[r].h) * 0.5) { row = rows[r]; break; }
+      if (!row) rows.push(row = { cy: cy, h: hh, items: [] });
+      row.items.push(b);
+    });
+    var ordered = []; rows.forEach(function (r) { r.items.sort(function (a, b) { return a.x0 - b.x0; }); ordered = ordered.concat(r.items); });
+    return { boxes: ordered, cell: cell, cw: cw, lab: lab };
+  }
+
+  /** Cuts one sprite out. Auto-detected boxes copy only their own pieces; hand-drawn boxes (label 0) copy everything inside. */
+  function cropSprite(d, w, h, box, found, pad) {
+    pad = pad == null ? 2 : pad;
+    var x0 = Math.max(0, Math.floor(box.x0)), y0 = Math.max(0, Math.floor(box.y0)), x1 = Math.min(w - 1, Math.ceil(box.x1)), y1 = Math.min(h - 1, Math.ceil(box.y1));
+    var bw = x1 - x0 + 1, bh = y1 - y0 + 1; if (bw < 1 || bh < 1) return { rgba: new Uint8ClampedArray(4), w: 1, h: 1 };
+    var tmp = new Uint8ClampedArray(bw * bh * 4), minX = bw, minY = bh, maxX = -1, maxY = -1;
+    for (var y = 0; y < bh; y++) for (var x = 0; x < bw; x++) {
+      var si = ((y0 + y) * w + (x0 + x)) * 4; if (d[si + 3] === 0) continue;
+      if (box.label > 0 && found && found.lab[(((y0 + y) / found.cell) | 0) * found.cw + (((x0 + x) / found.cell) | 0)] !== box.label) continue;
+      var di = (y * bw + x) * 4; tmp[di] = d[si]; tmp[di + 1] = d[si + 1]; tmp[di + 2] = d[si + 2]; tmp[di + 3] = d[si + 3];
+      if (x < minX) minX = x; if (y < minY) minY = y; if (x > maxX) maxX = x; if (y > maxY) maxY = y;
+    }
+    if (maxX < 0) return { rgba: new Uint8ClampedArray(4), w: 1, h: 1 };           // nothing visible in this box
+    var ow = maxX - minX + 1 + pad * 2, oh = maxY - minY + 1 + pad * 2, out = new Uint8ClampedArray(ow * oh * 4);
+    for (var yy = minY; yy <= maxY; yy++) for (var xx = minX; xx <= maxX; xx++) {
+      var a = (yy * bw + xx) * 4, b = ((yy - minY + pad) * ow + (xx - minX + pad)) * 4;
+      out[b] = tmp[a]; out[b + 1] = tmp[a + 1]; out[b + 2] = tmp[a + 2]; out[b + 3] = tmp[a + 3];
+    }
+    return { rgba: out, w: ow, h: oh };
+  }
+
+  root.SpriteCutter = { estimateBackground: estimateBackground, removeBackground: removeBackground, findSprites: findSprites, cropSprite: cropSprite };
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
 <script>
 (function () {
   'use strict';
@@ -222,13 +412,13 @@
   var toastT = 0;
   function say(msg) { var t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 3200); }
 
-  function blank() { return { id: '', text: '', pinyin: '', meaning: '', rarity: 'common', monster: '👾', name: '', tags: '', price: '', exclusive: false, story: '' }; }
+  function blank() { return { id: '', text: '', pinyin: '', meaning: '', rarity: 'common', monster: '👾', name: '', sprite: '', tags: '', price: '', exclusive: false, story: '' }; }
   function snap(c) { var o = {}; Object.keys(blank()).forEach(function (k) { o[k] = c[k]; }); return o; }
   function tagList(s) { return String(s).split(/[,，、]/).map(function (t) { return t.trim().toLowerCase(); }).filter(Boolean); }
   function toMd(c) {
     var L = [], add = function (k, v) { v = String(v == null ? '' : v).trim().replace(/\s*\n\s*/g, ' '); if (v) L.push(k + ': ' + v); };
     if (c.file && c.id && c.file !== c.id) add('id', c.id);
-    add('text', c.text); add('pinyin', c.pinyin); add('meaning', c.meaning); add('rarity', c.rarity); add('monster', c.monster); add('name', c.name);
+    add('text', c.text); add('pinyin', c.pinyin); add('meaning', c.meaning); add('rarity', c.rarity); add('monster', c.monster); add('name', c.name); add('sprite', c.sprite);
     var tg = tagList(c.tags); if (tg.length) L.push('tags: ' + tg.join(', '));
     if (String(c.price).trim()) L.push('price: ' + String(c.price).trim());
     if (c.exclusive) L.push('exclusive: yes');
@@ -248,7 +438,7 @@
     var r = (f.rarity || '').toLowerCase(); r = RC[r] ? r : (aliases[f.rarity] || 'common');
     var c = blank();
     c.id = f.id || ''; c.text = f.text; c.pinyin = f.pinyin || ''; c.meaning = f.meaning || ''; c.rarity = r; c.monster = f.monster || '👾'; c.name = f.name || '';
-    c.tags = f.tags || ''; c.price = f.price || ''; c.exclusive = /^(yes|true|y|1|是)$/i.test(f.exclusive || '');
+    c.tags = f.tags || ''; c.sprite = f.sprite || ''; c.price = f.price || ''; c.exclusive = /^(yes|true|y|1|是)$/i.test(f.exclusive || '');
     c.story = lines.slice(i + 1).filter(function (l) { return l.trim()[0] !== '#'; }).join('\n').trim();
     return c;
   }
@@ -269,6 +459,7 @@
     if (!c.pinyin.trim()) w.push('No pinyin yet.'); else if (n && py !== n) w.push('The phrase has ' + n + ' characters but the pinyin has ' + py + ' syllables.');
     if (!c.meaning.trim()) w.push('No meaning yet.');
     if (!c.name.trim()) w.push('No monster name, so the card shows the phrase as its name.');
+    if (c.sprite && !spriteByName(c.sprite)) w.push('The sprite "' + c.sprite + '" isn\'t in your sprite library.');
     return { errors: e, warns: w };
   }
 
@@ -307,7 +498,7 @@
   var S = {
     mode: 'boot',            // boot | setup | desktop | manual
     desktop: null, root: '', owner: '', repo: '', cards: [], sel: null, filter: { q: '', r: '' },
-    changed: {}, removed: [], busy: false, saveT: {}, seedCards: null, view: 'cards', cfg: null, cfgError: '', cfgBaseText: null, cfgChanged: false, selPack: null, seedCfg: null, packT: 0
+    changed: {}, removed: [], busy: false, saveT: {}, seedCards: null, view: 'cards', cfg: null, cfgError: '', cfgBaseText: null, cfgChanged: false, selPack: null, seedCfg: null, packT: 0, sprites: [], packImages: {}, spriteCh: {}, packImgCh: {}
   };
   var cur = function () { return S.cards.filter(function (c) { return c.uid === S.sel; })[0] || null; };
   var siteUrl = function () { return S.owner ? 'https://' + S.owner + '.github.io/' + S.repo + '/' : 'https://manifoldecor.github.io/chengyu/'; };
@@ -384,14 +575,16 @@
     },
     /** What differs from what is already on GitHub, from git itself. */
     async refreshChanges() {
-      var r = await D.exec('git -c core.quotepath=off status --porcelain -- content'), ch = {}, rem = [], cfgDirty = false;
+      var r = await D.exec('git -c core.quotepath=off status --porcelain -uall -- content'), ch = {}, rem = [], cfgDirty = false, sp = {}, pi = {};
       r.stdout.split(/\r?\n/).forEach(function (ln) {
         if (!ln.trim()) return; var code = ln.slice(0, 2), p = ln.slice(3).replace(/^"|"$/g, ''), m;
         if (p === 'content/game.json') { cfgDirty = true; return; }
         if ((m = /^content\/cards\/([^/]+)\.md$/.exec(p))) { if (m[1][0] === '_') return; if (/D/.test(code)) rem.push(m[1]); else (ch[m[1]] = ch[m[1]] || {}).card = /\?|A/.test(code) ? 'new' : 'edited'; }
         else if ((m = /^content\/art\/([^/]+)\.[^./]+$/.exec(p))) { (ch[m[1].toLowerCase()] = ch[m[1].toLowerCase()] || {}).art = /D/.test(code) ? 'removed' : 'changed'; }
+        else if ((m = /^content\/sprites\/([^/]+)\.[^./]+$/.exec(p))) { sp[m[1]] = /D/.test(code) ? 'removed' : /\?|A/.test(code) ? 'new' : 'changed'; }
+        else if ((m = /^content\/packs\/([^/]+)\.[^./]+$/.exec(p))) { pi[m[1]] = /D/.test(code) ? 'removed' : 'changed'; }
       });
-      S.changed = ch; S.removed = rem; S.cfgChanged = cfgDirty; renderAll();
+      S.changed = ch; S.removed = rem; S.cfgChanged = cfgDirty; S.spriteCh = sp; S.packImgCh = pi; renderAll();
     }
   };
   var refreshT = 0;
@@ -413,7 +606,7 @@
     return statusOf(c) !== 'published';
   }
   function changedCount() {
-    if (S.mode === 'desktop') { return Object.keys(S.changed).length + S.removed.length + (S.cfgChanged ? 1 : 0); }
+    if (S.mode === 'desktop') { return Object.keys(S.changed).length + S.removed.length + (S.cfgChanged ? 1 : 0) + Object.keys(S.spriteCh).length + Object.keys(S.packImgCh).length; }
     return S.cards.filter(function (c) { return statusOf(c) !== 'published'; }).length + (cfgChangedManual() ? 1 : 0);
   }
 
@@ -464,6 +657,7 @@
       await D.loadRepoInfo();
       var r = await D.loadCards(); S.cards = r.cards; S.mode = 'desktop'; S.sel = null; S.selPack = null;
       try { S.cfg = await D.loadConfig(); S.cfgError = ''; } catch (e) { S.cfg = null; S.cfgError = 'The file couldn\'t be read: ' + (e.message || e); }   // never overwrite a file we couldn't understand
+      try { S.sprites = await D.loadSprites(); S.packImages = await D.loadPackImages(); } catch (e) { S.sprites = []; S.packImages = {}; }
       try { localStorage.setItem('card-workshop-root', S.root); } catch (e) {}
       await D.refreshChanges().catch(function () {});
       renderAll();
@@ -514,6 +708,7 @@
   function renderGallery() {
     if (S.mode !== 'desktop' && S.mode !== 'manual') return;
     if (S.view === 'packs') { renderPacks(); return; }
+    if (S.view === 'sprites') { renderSprites(); return; }
     var chips = '<button class="chip" type="button" data-r="" aria-pressed="' + (S.filter.r === '') + '">All ' + S.cards.length + '</button>' + RAR.map(function (r) {
       return '<button class="chip" type="button" data-r="' + r.k + '" aria-pressed="' + (S.filter.r === r.k) + '"><span class="dot" style="--dot:var(--c-' + r.k + ')"></span>' + r.n + '</button>'; }).join('');
     var tiles = visibleCards().map(function (c) {
@@ -523,7 +718,7 @@
       else if (isChanged(c)) flag = '<span class="flag" title="Not published yet">Changed</span>';
       else if (v.errors.length) flag = '<span class="flag warn">Needs fixing</span>';
       return '<button type="button" class="tile" data-uid="' + c.uid + '" aria-current="' + (c.uid === S.sel) + '" style="--c:' + RC[c.rarity] + '">' + flag +
-        '<span class="pic">' + (c.art ? '<img alt="" src="' + esc(c.art.url) + '">' : esc(c.monster || '👾')) + '</span>' +
+        '<span class="pic">' + (picImg(c) || esc(c.monster || '👾')) + '</span>' +
         '<span class="hz">' + esc(c.text || 'New card') + '</span><span class="nm">' + esc(c.name || c.id || 'Unnamed') + '</span></button>';
     }).join('');
     $('#main').innerHTML = '<div class="toolbar"><input class="search" id="search" type="search" placeholder="Search cards" aria-label="Search cards" value="' + esc(S.filter.q) + '">' +
@@ -580,7 +775,7 @@
     var box = $('#preview'); if (!box) return;
     var tier = RAR.map(function (r) { return r.k; }).indexOf(c.rarity), chars = Array.from(c.text.trim()).length || 4;
     box.innerHTML = '<div class="cardwrap"><div class="card" style="--c:' + RC[c.rarity] + ';--n:' + chars + '"><div class="nm' + (c.name ? '' : ' ph') + '">' + esc(c.name || 'Monster name') + '</div>' +
-      '<div class="art">' + (c.art ? '<img alt="" src="' + esc(c.art.url) + '">' : esc(c.monster || '👾')) + '</div><div class="st">' + '★'.repeat(tier + 1) + '</div>' +
+      '<div class="art">' + (picImg(c) || esc(c.monster || '👾')) + '</div><div class="st">' + '★'.repeat(tier + 1) + '</div>' +
       '<div class="hz' + (c.text ? '' : ' ph') + '">' + esc(c.text.trim() || '成语') + '</div><div class="py' + (c.pinyin ? '' : ' ph') + '">' + esc(c.pinyin || 'pīnyīn') + '</div><div class="mn' + (c.meaning ? '' : ' ph') + '">' + esc(c.meaning || 'What it means') + '</div></div></div>';
   }
   function renderArt(c) {
@@ -614,8 +809,10 @@
     try {
       var pic = await toGamePng(file);
       c.art = { url: pic.url, file: c.id + '.png', ext: 'png', real: 'png', bytes: pic.bytes, w: pic.w, h: pic.h, fresh: true, b64: pic.b64 }; c.artSent = false;
+      var hadSprite = !!c.sprite; c.sprite = '';   // a picture you drop wins over a sprite you chose earlier
       if (S.mode === 'desktop') {
         if (!c.onDisk) { var v = validate(c, S.cards); if (v.errors.length) { say('Picture added. Finish the card details and it will be saved.'); touched(c, true); renderArt(c); return true; } await D.saveCard(c); }
+        if (hadSprite && c.onDisk) await D.saveCard(c);
         var removed = await D.saveArt(c, pic); scheduleRefresh();
         say('Saved ' + c.id + '.png (' + pic.w + '×' + pic.h + ', ' + kb(pic.bytes) + ')' + (removed.length ? ' and replaced ' + removed.join(', ') : '') + '. Press Publish when you are ready.');
       } else say('Picture converted to ' + c.id + '.png. Use Publish for the steps.');
@@ -623,7 +820,7 @@
     } catch (e) { say('Couldn\'t read that picture: ' + (e.message || e)); return false; }
   }
   async function dropFiles(files, target) {
-    if (S.view === 'packs') { say('Pictures go on cards. Switch to the Cards tab first.'); return; }
+    if (S.view !== 'cards') { dropElsewhere(files); return; }
     var imgs = Array.prototype.filter.call(files, function (f) { return /^image\//.test(f.type) || /\.(png|jpe?g|webp|gif|svg)$/i.test(f.name); });
     if (!imgs.length) return;
     if (S.mode !== 'desktop' && S.mode !== 'manual') { say('Open a card first.'); return; }
@@ -666,6 +863,8 @@
       });
       S.removed.forEach(function (id) { rows.push({ hz: id, id: id, what: 'removed' }); });
       if (S.cfgChanged) rows.push({ hz: 'Packs', id: 'game.json', what: 'pack settings' });
+      Object.keys(S.spriteCh).forEach(function (n) { rows.push({ hz: 'Sprite', id: n, what: S.spriteCh[n] === 'new' ? 'new sprite' : S.spriteCh[n] === 'removed' ? 'sprite removed' : 'sprite changed' }); });
+      Object.keys(S.packImgCh).forEach(function (n) { rows.push({ hz: 'Pack picture', id: n, what: S.packImgCh[n] === 'removed' ? 'picture removed' : 'pack picture' }); });
     } else {
       S.cards.forEach(function (c) { var st = statusOf(c); if (st !== 'published') rows.push({ hz: c.text || c.id, id: c.id, what: st === 'new' ? 'new card' : st === 'deleted' ? 'removed' : 'edited' }); });
       if (cfgChangedManual()) rows.push({ hz: 'Packs', id: 'game.json', what: 'pack settings' });
@@ -825,7 +1024,7 @@
     c.packs = c.packs.map(function (p) {
       var w = {}; RAR.forEach(function (r) { var v = Number(p.weights && p.weights[r.k]); w[r.k] = isFinite(v) && v > 0 ? v : 0; });
       var o = { uid: uid(), saved: true, id: String(p.id || ''), name: String(p.name || p.id || ''), cost: isFinite(Number(p.cost)) ? Math.max(0, Math.round(Number(p.cost))) : 0, weights: w };
-      if (p.icon) o.icon = String(p.icon); if (p.color) o.color = String(p.color); if (p.description) o.description = String(p.description);
+      if (p.icon) o.icon = String(p.icon); if (p.color) o.color = String(p.color); if (p.description) o.description = String(p.description); if (p.sprite) o.sprite = String(p.sprite);
       if (Array.isArray(p.tags) && p.tags.length) o.tags = p.tags.map(String);
       if (Array.isArray(p.cards) && p.cards.length) o.cards = p.cards.map(String);
       o.mode = o.cards ? 'cards' : (o.tags ? 'tags' : 'all');   // which "what can come out" choice is showing (not saved to the file)
@@ -836,7 +1035,7 @@
   }
   function packOut(p) {
     var o = { id: p.id, name: p.name.trim() };
-    if (p.icon) o.icon = p.icon; if (p.color) o.color = p.color; if (p.description && p.description.trim()) o.description = p.description.trim();
+    if (p.icon) o.icon = p.icon; if (p.color) o.color = p.color; if (p.description && p.description.trim()) o.description = p.description.trim(); if (p.sprite) o.sprite = p.sprite;
     o.cost = p.cost; o.weights = p.weights;
     if (p.tags && p.tags.length) o.tags = p.tags; if (p.cards && p.cards.length) o.cards = p.cards;
     return o;
@@ -889,12 +1088,12 @@
   }
   function packFace(p, big) {
     var daily = S.cfg.dailyPack === p.id, col = /^#[0-9a-f]{6}$/i.test(p.color || '') ? p.color : '#a3261e';
-    return '<span class="tag">' + (daily ? 'Daily · free' : '🖋️ ' + p.cost) + '</span><span class="ico">' + esc(p.icon || '📦') + '</span><span class="pn">' + esc(p.name || 'Unnamed pack') + '</span>' + oddsBar(p) +
+    return '<span class="tag">' + (daily ? 'Daily · free' : '🖋️ ' + p.cost) + '</span><span class="ico">' + packPic(p) + '</span><span class="pn">' + esc(p.name || 'Unnamed pack') + '</span>' + oddsBar(p) +
       (big && p.description ? '<span class="pdesc">' + esc(p.description) + '</span>' : '');
   }
   function renderTabs() {
     var t = $('#tabs'), on = S.mode === 'desktop' || S.mode === 'manual'; t.hidden = !on; if (!on) return;
-    t.innerHTML = ['cards', 'packs'].map(function (v) { return '<button type="button" data-view="' + v + '" aria-pressed="' + (S.view === v) + '">' + (v === 'cards' ? 'Cards' : 'Packs') + '</button>'; }).join('');
+    t.innerHTML = [['cards', 'Cards'], ['packs', 'Packs'], ['sprites', 'Sprites']].map(function (v) { return '<button type="button" data-view="' + v[0] + '" aria-pressed="' + (S.view === v[0]) + '">' + v[1] + '</button>'; }).join('');
   }
   function renderPacks() {
     if (!S.cfg) { $('#main').innerHTML = '<div class="center"><h1>game.json has a mistake</h1><p>' + esc(S.cfgError || '') + '</p><p class="hint">Nothing was changed. Fix the file (or restore it from GitHub) and reopen the workshop.</p></div>'; return; }
@@ -1035,6 +1234,327 @@
     if (t.dataset.pcard !== undefined) { p.cards = p.cards || []; var id = t.dataset.pcard, i = p.cards.indexOf(id); if (t.checked && i < 0) p.cards.push(id); else if (!t.checked && i >= 0) p.cards.splice(i, 1); touchedPack(p); }
     else if (t.dataset.pact === 'daily' && t.checked) makeDaily(p);
   });
+
+  /* ================= sprites: a library of cut-out pictures, the cutter, and picking them for cards and packs ================= */
+  var SC = window.SpriteCutter;
+  var spriteByName = function (n) { n = String(n || '').toLowerCase(); return n ? (S.sprites.filter(function (s) { return s.name.toLowerCase() === n; })[0] || null) : null; };
+  /** The picture a card shows in the workshop, same priority as the game: a chosen sprite (shown whole), else its picture file. */
+  function artSrc(c) { var sp = spriteByName(c.sprite); if (sp) return { url: sp.url, fit: 'contain' }; return c.art ? { url: c.art.url, fit: 'cover' } : null; }
+  function picImg(c) { var a = artSrc(c); return a ? '<img alt="" src="' + esc(a.url) + '"' + (a.fit === 'contain' ? ' style="object-fit:contain;padding:7%"' : '') + '>' : ''; }
+  function packImgUrl(p) { var sp = spriteByName(p.sprite); return sp ? sp.url : (S.packImages[p.id] || ''); }
+  function packPic(p) { var u = packImgUrl(p); return u ? '<img class="pimg" alt="" src="' + esc(u) + '">' : esc(p.icon || '📦'); }
+  function usedBy(name) {
+    var n = String(name).toLowerCase();
+    return S.cards.filter(function (c) { return (c.sprite || '').toLowerCase() === n; }).map(function (c) { return c.text || c.id; })
+      .concat(S.cfg ? S.cfg.packs.filter(function (p) { return (p.sprite || '').toLowerCase() === n; }).map(function (p) { return p.name; }) : []);
+  }
+  function measure2(item) { var im = new Image(); im.onload = function () { item.w = im.naturalWidth; item.h = im.naturalHeight; if (S.view === 'sprites' && !CUT) renderSprites(); }; im.src = item.url; }
+
+  /* ----- disk (desktop edition) ----- */
+  D.listImages = async function (folder, re) {
+    var fsx = S.desktop.fs, dir = D.path('content/' + folder), out = [];
+    if (!(await fsx.exists(dir))) return out;
+    var files = (await fsx.readdir(dir)).filter(function (e) { return e.isFile && re.test(e.name); });
+    for (var i = 0; i < files.length; i++) {
+      var b64 = await fsx.readFile(dir + '/' + files[i].name, 'base64'), ext = files[i].name.split('.').pop().toLowerCase().replace('jpeg', 'jpg'), real = sniff(b64) || ext;
+      out.push({ name: files[i].name.replace(/\.[^.]+$/, ''), file: files[i].name, ext: ext, url: 'data:' + (MIME[real] || MIME[ext]) + ';base64,' + b64, bytes: Math.round(b64.length * 0.75) });
+    }
+    return out;
+  };
+  D.loadSprites = async function () { var l = await D.listImages('sprites', /\.(png|webp|gif)$/i); l.forEach(measure2); return l; };
+  D.loadPackImages = async function () { var l = await D.listImages('packs', /\.(png|jpe?g|webp|gif|svg)$/i), m = {}; l.forEach(function (x) { m[x.name] = x.url; }); return m; };
+  D.saveSprite = async function (name, b64) { await S.desktop.fs.mkdir(D.path('content/sprites'), { recursive: true }); await S.desktop.fs.writeFile(D.path('content/sprites/' + name + '.png'), b64, 'base64'); };
+  D.trashSprite = function (file) { return S.desktop.shell.trashItem(D.path('content/sprites/' + file)); };
+  D.savePackImage = async function (id, b64) {
+    var fsx = S.desktop.fs; await fsx.mkdir(D.path('content/packs'), { recursive: true });
+    await fsx.writeFile(D.path('content/packs/' + id + '.png'), b64, 'base64');
+    var others = (await fsx.readdir(D.path('content/packs'))).filter(function (e) { return e.isFile && e.name.replace(/\.[^.]+$/, '').toLowerCase() === id.toLowerCase() && e.name !== id + '.png'; });
+    for (var i = 0; i < others.length; i++) await S.desktop.shell.trashItem(D.path('content/packs/' + others[i].name));
+  };
+  D.trashPackImage = async function (id) {
+    var fsx = S.desktop.fs; if (!(await fsx.exists(D.path('content/packs')))) return;
+    var mine = (await fsx.readdir(D.path('content/packs'))).filter(function (e) { return e.isFile && e.name.replace(/\.[^.]+$/, '').toLowerCase() === id.toLowerCase(); });
+    for (var i = 0; i < mine.length; i++) await S.desktop.shell.trashItem(D.path('content/packs/' + mine[i].name));
+  };
+
+  /* ----- image helpers ----- */
+  async function readSheet(file) {
+    var src; try { var b = await createImageBitmap(file); src = { el: b, w: b.width, h: b.height, done: function () { if (b.close) b.close(); } }; } catch (e) { src = await loadImage(file); }
+    var s = Math.min(1, 4000 / Math.max(src.w, src.h)), w = Math.max(1, Math.round(src.w * s)), h = Math.max(1, Math.round(src.h * s));
+    var cv = document.createElement('canvas'); cv.width = w; cv.height = h; var g = cv.getContext('2d', { willReadFrequently: true }); g.drawImage(src.el, 0, 0, w, h); src.done();
+    return { w: w, h: h, data: g.getImageData(0, 0, w, h).data };
+  }
+  function rgbaToCanvas(rgba, w, h) { var cv = document.createElement('canvas'); cv.width = w; cv.height = h; cv.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(rgba), w, h), 0, 0); return cv; }
+  function canvasPng(cv, maxSide) {
+    var s = Math.min(1, maxSide / Math.max(cv.width, cv.height)), out = cv;
+    if (s < 1) { out = document.createElement('canvas'); out.width = Math.max(1, Math.round(cv.width * s)); out.height = Math.max(1, Math.round(cv.height * s)); var g = out.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(cv, 0, 0, out.width, out.height); }
+    var url = out.toDataURL('image/png'), b64 = url.split(',')[1];
+    return { url: url, b64: b64, w: out.width, h: out.height, bytes: Math.round(b64.length * 0.75) };
+  }
+  async function urlToRgba(url) {
+    var im = await new Promise(function (res, rej) { var i = new Image(); i.onload = function () { res(i); }; i.onerror = rej; i.src = url; });
+    var cv = document.createElement('canvas'); cv.width = im.naturalWidth; cv.height = im.naturalHeight; var g = cv.getContext('2d', { willReadFrequently: true }); g.drawImage(im, 0, 0);
+    return { w: cv.width, h: cv.height, data: g.getImageData(0, 0, cv.width, cv.height).data };
+  }
+
+  /* ================= the Sprites tab ================= */
+  function renderSprites() {
+    var tiles = S.sprites.map(function (s) {
+      var used = usedBy(s.name);
+      return '<div class="stile"><div class="simg checker"><img alt="' + esc(s.name) + '" src="' + esc(s.url) + '"></div><div class="sname">' + esc(s.name) + '</div>' +
+        '<div class="hint">' + (s.w ? s.w + '×' + s.h + ' · ' : '') + (used.length ? 'used by ' + used.length : 'not used yet') + '</div>' +
+        '<button class="btn small danger" type="button" data-sact="del" data-sname="' + esc(s.name) + '">Remove</button></div>';
+    }).join('');
+    $('#main').innerHTML = '<div class="toolbar"><p class="hint" style="flex:1">Sprites are cut-out pictures with a transparent background. Cut them from a sprite sheet once, then use them on any card or pack.</p></div>' +
+      '<div class="spdrop" id="spdrop" tabindex="0" role="button" aria-label="Drop a sprite sheet here or press Enter to choose one"><b>Drop a sprite sheet here</b>' +
+      '<span class="hint">A picture with several sprites on one background. I remove the background, find each sprite, and let you name them.</span>' +
+      '<span class="btn small">Choose a sheet…</span><input type="file" id="sheet-file" accept="image/png,image/jpeg,image/webp,image/gif" hidden></div>' +
+      (S.mode === 'manual' ? '<p class="hint" style="margin-top:8px">Cutting works here, but saving sprites into the game needs the local Card Workshop (it writes into your project folder).</p>' : '') +
+      (tiles ? '<h3 class="h2">Your sprites (' + S.sprites.length + ')</h3><div class="gallery sprites" id="gallery">' + tiles + '</div>' : '<p class="empty">No sprites yet. Drop a sprite sheet above to make your first ones.</p>');
+  }
+  var spDelArmed = '';
+  async function deleteSprite(name) {
+    var sp = spriteByName(name); if (!sp) return; var used = usedBy(name), btn = document.querySelector('[data-sname="' + name.replace(/"/g, '\\"') + '"]');
+    if (spDelArmed !== name) { spDelArmed = name; if (btn) btn.textContent = used.length ? 'Used by ' + used.length + '. Click again to remove' : 'Click again to remove'; setTimeout(function () { if (spDelArmed === name) { spDelArmed = ''; if (btn) btn.textContent = 'Remove'; } }, 4000); return; }
+    spDelArmed = '';
+    try { if (S.mode === 'desktop') await D.trashSprite(sp.file || (sp.name + '.png')); } catch (e) { say('Couldn\'t remove it: ' + (e.message || e)); return; }
+    S.sprites = S.sprites.filter(function (x) { return x !== sp; }); renderSprites(); scheduleRefresh(); renderBar();
+    say('Moved to the Recycle Bin.' + (used.length ? ' ' + used.join(', ') + ' will go back to their usual picture until you pick another sprite.' : ''));
+  }
+
+  /* ================= the cutter ================= */
+  var CUT = null, cutIds = 0;
+  var cutHost = function () { var h = $('#cutter'); if (!h) { h = document.createElement('div'); h.id = 'cutter'; document.body.appendChild(h); } return h; };
+  function closeCutter() { CUT = null; var h = $('#cutter'); if (h) h.innerHTML = ''; }
+  async function openCutter(file) {
+    if (S.mode !== 'desktop' && S.mode !== 'manual') return;
+    var h = cutHost(); h.innerHTML = '<div class="scrim"><div class="sheet"><p class="hint">Reading the picture…</p></div></div>';
+    try {
+      var sh = await readSheet(file), bg = SC.estimateBackground(sh.data, sh.w, sh.h);
+      CUT = { name: slug(file.name.replace(/\.[^.]+$/, '')) || 'sprite', w: sh.w, h: sh.h, orig: sh.data, bg: bg, colors: bg.colors.slice(), tol: 40, gap: 8, minSize: 14, inside: false, picking: false, boxes: [] };
+      cutAnalyze();
+    } catch (e) { h.innerHTML = ''; say('Couldn\'t read that picture: ' + (e.message || e)); }
+  }
+  function cutAnalyze() {
+    var C = CUT, prev = C.boxes || [];
+    C.clean = C.bg.transparent ? C.orig : SC.removeBackground(C.orig, C.w, C.h, { colors: C.colors, tolerance: C.tol, inside: C.inside });
+    C.found = SC.findSprites(C.clean, C.w, C.h, { gap: C.gap, minSize: C.minSize });
+    var iou = function (a, b) { var x0 = Math.max(a.x0, b.x0), y0 = Math.max(a.y0, b.y0), x1 = Math.min(a.x1, b.x1), y1 = Math.min(a.y1, b.y1); if (x1 < x0 || y1 < y0) return 0; var i = (x1 - x0 + 1) * (y1 - y0 + 1), u = (a.x1 - a.x0 + 1) * (a.y1 - a.y0 + 1) + (b.x1 - b.x0 + 1) * (b.y1 - b.y0 + 1) - i; return i / u; };
+    var next = C.found.boxes.map(function (b) {
+      var m = prev.filter(function (p) { return !p.manual && iou(p, b) > 0.5; })[0];
+      return { id: ++cutIds, x0: b.x0, y0: b.y0, x1: b.x1, y1: b.y1, label: b.label, name: m ? m.name : '', keep: m ? m.keep : true, manual: false };
+    });
+    prev.filter(function (p) { return p.manual; }).forEach(function (p) { p.thumb = ''; next.push(p); });
+    C.boxes = next; cutNameAll(); cutRender();
+  }
+  function cutNameAll() {
+    var taken = {}; S.sprites.forEach(function (s) { taken[s.name.toLowerCase()] = 1; });
+    var mine = {}; CUT.boxes.forEach(function (b) { if (b.name) mine[b.name.toLowerCase()] = 1; });
+    var n = 1; CUT.boxes.forEach(function (b) { if (b.name) return; var nm; do { nm = CUT.name + '-' + (n++); } while (taken[nm] || mine[nm]); b.name = nm; mine[nm] = 1; });
+  }
+  function boxThumb(b) {
+    if (b.thumb) return b.thumb;
+    var sp = SC.cropSprite(CUT.clean, CUT.w, CUT.h, b, b.manual ? null : CUT.found, 1), cv = rgbaToCanvas(sp.rgba, sp.w, sp.h), s = Math.min(1, 96 / Math.max(sp.w, sp.h)), t = document.createElement('canvas');
+    t.width = Math.max(1, Math.round(sp.w * s)); t.height = Math.max(1, Math.round(sp.h * s)); t.getContext('2d').drawImage(cv, 0, 0, t.width, t.height);
+    return (b.thumb = t.toDataURL('image/png'));
+  }
+  function cutRender() {
+    var C = CUT, h = cutHost(), keep = C.boxes.filter(function (b) { return b.keep; }).length, can = S.mode === 'desktop';
+    var sw = C.bg.transparent ? '<span class="hint">This picture already has a transparent background.</span>'
+      : C.colors.map(function (c) { return '<span class="bgchip"><i style="background:rgb(' + c.join(',') + ')"></i>rgb(' + c.join(', ') + ')</span>'; }).join('') + '<button class="btn small" type="button" data-cact="pick">' + (C.picking ? 'Click the background…' : 'Pick the colour…') + '</button>';
+    var slider = function (id, label, min, max, v, hint) { return '<div class="field"><label for="cut-' + id + '">' + label + ' <b id="cutv-' + id + '">' + v + '</b></label><input type="range" id="cut-' + id + '" data-cslide="' + id + '" min="' + min + '" max="' + max + '" value="' + v + '"><span class="hint">' + hint + '</span></div>'; };
+    var list = C.boxes.map(function (b, i) {
+      return '<div class="cutrow' + (b.keep ? '' : ' off') + '" data-crow="' + b.id + '"><span class="checker cthumb"><img alt="" src="' + esc(boxThumb(b)) + '"></span>' +
+        '<div class="cutfields"><label class="hint" for="cn-' + b.id + '">#' + (i + 1) + ' · ' + (b.x1 - b.x0 + 1) + '×' + (b.y1 - b.y0 + 1) + (b.manual ? ' · drawn by hand' : '') + '</label><input class="in" id="cn-' + b.id + '" data-cname="' + b.id + '" value="' + esc(b.name) + '" autocomplete="off" aria-label="Name for sprite ' + (i + 1) + '"></div>' +
+        '<label class="check" title="Include this one"><input type="checkbox" data-ckeep="' + b.id + '"' + (b.keep ? ' checked' : '') + '></label></div>'; }).join('');
+    var boxes = C.boxes.map(function (b, i) {
+      return '<div class="cutbox' + (b.keep ? '' : ' off') + '" data-cbox="' + b.id + '" style="left:' + (b.x0 / C.w * 100) + '%;top:' + (b.y0 / C.h * 100) + '%;width:' + ((b.x1 - b.x0 + 1) / C.w * 100) + '%;height:' + ((b.y1 - b.y0 + 1) / C.h * 100) + '%"><span class="n">' + (i + 1) + '</span><button type="button" class="cutdel" data-cdel="' + b.id + '" aria-label="Drop sprite ' + (i + 1) + '">×</button></div>'; }).join('');
+    h.innerHTML = '<div class="scrim"><div class="sheet wide" role="dialog" aria-modal="true" aria-label="Sprite cutter"><h2>Cut sprites from “' + esc(C.name) + '”</h2>' +
+      '<div class="cutgrid"><div class="cutleft"><div class="cutstage checker' + (C.picking ? ' picking' : '') + '" id="cutstage"><canvas id="cutcanvas"></canvas>' + boxes + '<div class="cutrubber" id="cutrubber" hidden></div></div>' +
+      '<p class="hint">' + (C.boxes.length ? 'Found ' + C.boxes.length + ' sprite' + (C.boxes.length === 1 ? '' : 's') + '. ' : 'Nothing found yet: try a lower tolerance or a smaller speck size. ') + 'Missed one? Drag on the picture to draw a box around it. Click × on a box to drop it.</p></div>' +
+      '<div class="cutright"><div class="field"><span class="lab">Background</span><div class="bgrow">' + sw + '</div></div>' +
+      (C.bg.transparent ? '' : slider('tol', 'How close counts as background', 0, 120, C.tol, 'Higher removes more of the colour around the edges. Lower keeps more detail.') +
+        '<label class="check"><input type="checkbox" data-cact="inside"' + (C.inside ? ' checked' : '') + '><span><b>Also remove that colour inside the sprites</b><br><span class="hint">Off keeps things like white eyes.</span></span></label>') +
+      slider('gap', 'Keep pieces together if closer than (px)', 0, 60, C.gap, 'Raise it if one sprite splits into parts; lower it if two sprites got joined.') +
+      slider('min', 'Ignore specks smaller than (px)', 0, 120, C.minSize, 'Dust and stray marks.') +
+      '<div class="field"><span class="lab">Sprites to save</span><div class="cutlist" id="cutlist">' + (list || '<p class="hint">None yet.</p>') + '</div></div></div></div>' +
+      (can ? '' : '<p class="hint">Saving sprites into the game needs the local Card Workshop (it writes into your project folder).</p>') +
+      '<div class="btnrow"><button class="btn primary" type="button" data-cact="save" id="cutsave"' + (keep && can ? '' : ' disabled') + '>' + (keep ? 'Save ' + keep + ' sprite' + (keep === 1 ? '' : 's') + ' to your library' : 'Nothing to save') + '</button><button class="btn" type="button" data-cact="cancel">Cancel</button></div></div></div>';
+    var cv = $('#cutcanvas'); cv.width = C.w; cv.height = C.h; cv.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(C.clean), C.w, C.h), 0, 0);
+  }
+  function cutRefreshSave() {
+    var keep = CUT.boxes.filter(function (b) { return b.keep; }).length, btn = $('#cutsave'); if (!btn) return;
+    btn.disabled = !(keep && S.mode === 'desktop'); btn.textContent = keep ? 'Save ' + keep + ' sprite' + (keep === 1 ? '' : 's') + ' to your library' : 'Nothing to save';
+  }
+  async function cutSave() {
+    var C = CUT, kept = C.boxes.filter(function (b) { return b.keep; }); if (!kept.length) return;
+    var used = {}, saved = [], btn = $('#cutsave'); if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+    try {
+      for (var i = 0; i < kept.length; i++) {
+        var b = kept[i], name = slug(b.name) || (C.name + '-' + (i + 1)), nm = name, n = 2; while (used[nm]) nm = name + '-' + (n++); used[nm] = 1;
+        var sp = SC.cropSprite(C.clean, C.w, C.h, b, b.manual ? null : C.found, 2), png = canvasPng(rgbaToCanvas(sp.rgba, sp.w, sp.h), 1400);
+        await D.saveSprite(nm, png.b64);
+        var item = { name: nm, file: nm + '.png', ext: 'png', url: png.url, bytes: png.bytes, w: png.w, h: png.h }, at = -1;
+        S.sprites.forEach(function (s, k) { if (s.name.toLowerCase() === nm.toLowerCase()) at = k; });
+        if (at >= 0) S.sprites[at] = item; else S.sprites.push(item);
+        saved.push(nm);
+      }
+    } catch (e) { say('Couldn\'t save: ' + (e.message || e)); cutRefreshSave(); return; }
+    S.sprites.sort(function (a, b) { return a.name.localeCompare(b.name); });
+    closeCutter(); S.view = 'sprites'; scheduleRefresh(); renderAll();
+    say('Saved ' + saved.length + ' sprite' + (saved.length === 1 ? '' : 's') + ': ' + saved.join(', ') + '. Press Publish to send them to the game.');
+  }
+  var cutT = 0;
+  function cutRedo(now) { clearTimeout(cutT); cutT = setTimeout(function () { if (CUT) cutAnalyze(); }, now ? 0 : 180); }
+
+  /* ================= picking a sprite (for a card or a pack) ================= */
+  function pickSprite(title, onPick) {
+    var host = $('#picker') || (function () { var d = document.createElement('div'); d.id = 'picker'; document.body.appendChild(d); return d; })();
+    var tiles = S.sprites.map(function (s) { return '<button type="button" class="spick" data-spick="' + esc(s.name) + '"><span class="checker"><img alt="" src="' + esc(s.url) + '"></span><span>' + esc(s.name) + '</span></button>'; }).join('');
+    host.innerHTML = '<div class="scrim" id="pickscrim"><div class="sheet" role="dialog" aria-modal="true" aria-label="' + esc(title) + '"><h2>' + esc(title) + '</h2>' +
+      (tiles ? '<div class="spickgrid">' + tiles + '</div>' : '<p class="hint">Your sprite library is empty. Cut some from a sprite sheet on the Sprites tab first.</p>') +
+      '<div class="btnrow"><button class="btn" type="button" data-spick="">Cancel</button>' + (tiles ? '' : '<button class="btn primary" type="button" data-spick="" data-gotosprites="1">Go to Sprites</button>') + '</div></div></div>';
+    pickSprite.cb = onPick;
+  }
+  function closePicker() { var h = $('#picker'); if (h) h.innerHTML = ''; pickSprite.cb = null; }
+
+  /* ----- cards: choose a sprite ----- */
+  var _renderArt = renderArt;
+  renderArt = function (c) {
+    _renderArt(c);
+    var box = $('#artbox'); if (!box) return;
+    var sp = spriteByName(c.sprite), extra = document.createElement('div'); extra.className = 'spriterow';
+    extra.innerHTML = sp
+      ? '<span class="checker cthumb"><img alt="" src="' + esc(sp.url) + '"></span><span><b>Sprite: ' + esc(sp.name) + '</b><br><span class="hint">Used instead of the picture file, shown whole.</span></span><span class="btnrow"><button class="btn small" type="button" data-sact="card-sprite">Change</button><button class="btn small" type="button" data-sact="card-sprite-clear">Remove</button></span>'
+      : (c.sprite ? '<span class="hint" style="color:var(--warn)">The sprite “' + esc(c.sprite) + '” isn\'t in your library.</span>' : '') + '<button class="btn small" type="button" data-sact="card-sprite">Choose from sprites…</button>';
+    box.appendChild(extra);
+  };
+
+  /* ----- packs: a picture, or a sprite ----- */
+  var _renderPackDrawer = renderPackDrawer;
+  renderPackDrawer = function (full) { _renderPackDrawer(full); if (full) packPicField(); };
+  function packPicField() {
+    var p = cur2(), d = $('#drawer'), cost = $('#pk-cost'); if (!p || !cost) return;
+    var outer = cost.closest('.field').parentElement.closest('.field'), f = document.createElement('div'); f.className = 'field'; f.id = 'pk-picfield';
+    outer.parentElement.insertBefore(f, outer); packPicRender(p);
+    void d;
+  }
+  function packPicRender(p) {
+    var f = $('#pk-picfield'); if (!f) return; var u = packImgUrl(p), sp = spriteByName(p.sprite);
+    f.innerHTML = '<span class="lab">Picture <span class="hint">(optional, replaces the emoji)</span></span><div class="pic-row"><div class="checker pk-prev">' + (u ? '<img alt="" src="' + esc(u) + '">' : '<span style="font-size:40px">' + esc(p.icon || '📦') + '</span>') + '</div>' +
+      '<div class="btnrow"><button class="btn small" type="button" data-sact="pack-upload">Upload a picture…</button><button class="btn small" type="button" data-sact="pack-sprite">Choose a sprite…</button>' +
+      (u && !sp ? '<button class="btn small" type="button" data-sact="pack-nobg">Remove its background</button>' : '') + (u ? '<button class="btn small danger" type="button" data-sact="pack-pic-clear">Remove picture</button>' : '') + '</div></div>' +
+      '<input type="file" id="pk-file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" hidden>' +
+      '<span class="hint">' + (sp ? 'Using the sprite “' + esc(sp.name) + '”.' : u ? 'Shown whole on the pack. A transparent PNG looks best. You can also drop a picture here.' : 'A transparent PNG looks best. You can also drop a picture anywhere on this page.') + '</span>';
+  }
+  async function setPackPicture(p, file) {
+    if (!p.saved) { say('Name the pack and finish its details first, so its picture has a file name to be saved under.'); return; }
+    try {
+      var pic = await toGamePng(file);                                          // stays a transparent PNG
+      if (S.mode === 'desktop') await D.savePackImage(p.id, pic.b64);
+      S.packImages[p.id] = pic.url;
+      if (p.sprite) { delete p.sprite; await saveCfg(); }
+      renderPacks(); packPicRender(p); renderPackLive(p); scheduleRefresh(); renderBar();
+      say(S.mode === 'desktop' ? 'Saved the picture for ' + p.name + '. Press Publish when you are ready.' : 'Picture set. Saving it into the game needs the local Card Workshop.');
+    } catch (e) { say('Couldn\'t use that picture: ' + (e.message || e)); }
+  }
+  async function clearPackPicture(p) {
+    try { if (S.mode === 'desktop') await D.trashPackImage(p.id); } catch (e) { say('Couldn\'t remove it: ' + (e.message || e)); return; }
+    delete S.packImages[p.id]; var had = !!p.sprite; delete p.sprite; if (had) await saveCfg();
+    renderPacks(); packPicRender(p); renderPackLive(p); scheduleRefresh(); renderBar();
+  }
+  async function packSprite(p, name) {
+    if (S.mode === 'desktop' && S.packImages[p.id]) { try { await D.trashPackImage(p.id); } catch (e) { /* keep going */ } delete S.packImages[p.id]; }   // a sprite replaces any picture file
+    p.sprite = name; p.saved = true; await saveCfg(); renderPacks(); packPicRender(p); renderPackLive(p); scheduleRefresh(); renderBar();
+  }
+  async function packNoBg(p) {
+    var u = S.packImages[p.id]; if (!u) return;
+    try {
+      var im = await urlToRgba(u), bg = SC.estimateBackground(im.data, im.w, im.h);
+      if (bg.transparent) { say('That picture is already transparent.'); return; }
+      var clean = SC.removeBackground(im.data, im.w, im.h, { colors: bg.colors, tolerance: 40 }), png = canvasPng(rgbaToCanvas(clean, im.w, im.h), 1400);
+      if (S.mode === 'desktop') await D.savePackImage(p.id, png.b64);
+      S.packImages[p.id] = png.url; renderPacks(); packPicRender(p); renderPackLive(p); scheduleRefresh(); say('Background removed.');
+    } catch (e) { say('Couldn\'t do that: ' + (e.message || e)); }
+  }
+
+  /* ----- drops outside the Cards tab ----- */
+  function dropElsewhere(files) {
+    var f = Array.prototype.filter.call(files, function (x) { return /^image\//.test(x.type) || /\.(png|jpe?g|webp|gif|svg)$/i.test(x.name); })[0]; if (!f) return;
+    if (S.view === 'sprites') { openCutter(f); return; }
+    var p = cur2(); if (S.view === 'packs' && p) { setPackPicture(p, f); return; }
+    say(S.view === 'packs' ? 'Open a pack first, then drop its picture.' : 'Pictures go on cards. Switch to the Cards tab first.');
+  }
+
+  /* ----- events ----- */
+  document.addEventListener('click', async function (e) {
+    var t = e.target.closest('[data-sact],[data-cact],[data-cdel],[data-spick],#spdrop'); if (!t) return;
+    var p = cur2(), c = cur();
+    if (t.id === 'spdrop') { if (!e.target.closest('input')) { var fi = $('#sheet-file'); if (fi) fi.click(); } return; }
+    if (t.dataset.spick !== undefined) {
+      var cb = pickSprite.cb, nm = t.dataset.spick, goto = t.dataset.gotosprites; closePicker();
+      if (goto) { S.view = 'sprites'; closeDrawer(); renderAll(); } else if (nm && cb) cb(nm); return;
+    }
+    if (t.dataset.cdel) { var b = CUT.boxes.filter(function (x) { return String(x.id) === t.dataset.cdel; })[0]; if (b) { b.keep = false; cutRender(); } return; }
+    if (t.dataset.cact) {
+      var a = t.dataset.cact;
+      if (a === 'cancel') closeCutter();
+      else if (a === 'save') cutSave();
+      else if (a === 'pick') { CUT.picking = !CUT.picking; cutRender(); }
+      else if (a === 'inside') { CUT.inside = t.checked; cutRedo(true); }
+      return;
+    }
+    switch (t.dataset.sact) {
+      case 'del': deleteSprite(t.dataset.sname); break;
+      case 'card-sprite': if (c) pickSprite('Choose a sprite for ' + (c.text || 'this card'), function (name) { c.sprite = name; touched(c, true); renderArt(c); renderGallery(); }); break;
+      case 'card-sprite-clear': if (c) { c.sprite = ''; touched(c, true); renderArt(c); renderGallery(); } break;
+      case 'pack-upload': { var pf = $('#pk-file'); if (pf) pf.click(); break; }
+      case 'pack-sprite': if (p) pickSprite('Choose a sprite for ' + p.name, function (name) { packSprite(p, name); }); break;
+      case 'pack-nobg': if (p) packNoBg(p); break;
+      case 'pack-pic-clear': if (p) clearPackPicture(p); break;
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { if (CUT) closeCutter(); else if ($('#picker') && $('#picker').innerHTML) closePicker(); }
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.id === 'spdrop') { e.preventDefault(); var fi = $('#sheet-file'); if (fi) fi.click(); }
+  });
+  document.addEventListener('change', function (e) {
+    var t = e.target;
+    if (t.id === 'sheet-file' && t.files && t.files[0]) { openCutter(t.files[0]); t.value = ''; return; }
+    if (t.id === 'pk-file' && t.files && t.files[0]) { var p = cur2(); if (p) setPackPicture(p, t.files[0]); t.value = ''; return; }
+    if (CUT && t.dataset.ckeep) { var b = CUT.boxes.filter(function (x) { return String(x.id) === t.dataset.ckeep; })[0]; if (b) { b.keep = t.checked; var row = $('[data-crow="' + b.id + '"]'); if (row) row.classList.toggle('off', !b.keep); var bx = $('[data-cbox="' + b.id + '"]'); if (bx) bx.classList.toggle('off', !b.keep); cutRefreshSave(); } return; }
+    if (CUT && t.dataset.cslide) { var k = t.dataset.cslide; if (k === 'tol') CUT.tol = Number(t.value); else if (k === 'gap') CUT.gap = Number(t.value); else CUT.minSize = Number(t.value); cutRedo(true); }
+  });
+  document.addEventListener('input', function (e) {
+    var t = e.target; if (!CUT) return;
+    if (t.dataset.cslide) { var v = $('#cutv-' + t.dataset.cslide); if (v) v.textContent = t.value; return; }
+    if (t.dataset.cname) { var b = CUT.boxes.filter(function (x) { return String(x.id) === t.dataset.cname; })[0]; if (b) b.name = t.value; }
+  });
+  // drawing a box by hand, and picking the background colour, on the cutter's picture
+  (function () {
+    var drag = null;
+    document.addEventListener('pointerdown', function (e) {
+      var st = e.target.closest && e.target.closest('#cutstage'); if (!st || !CUT || e.target.closest('.cutdel')) return;
+      var r = st.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * CUT.w, y = (e.clientY - r.top) / r.height * CUT.h;
+      if (CUT.picking) {
+        var ix = Math.min(CUT.w - 1, Math.max(0, Math.round(x))), iy = Math.min(CUT.h - 1, Math.max(0, Math.round(y))), i = (iy * CUT.w + ix) * 4;
+        CUT.colors = [[CUT.orig[i], CUT.orig[i + 1], CUT.orig[i + 2]]]; CUT.bg = { transparent: false, colors: CUT.colors }; CUT.picking = false; cutAnalyze(); return;
+      }
+      drag = { x: x, y: y, sx: e.clientX, sy: e.clientY, st: st }; st.setPointerCapture(e.pointerId); e.preventDefault();
+    });
+    document.addEventListener('pointermove', function (e) {
+      if (!drag) return; var r = drag.st.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * CUT.w, y = (e.clientY - r.top) / r.height * CUT.h, rb = $('#cutrubber');
+      var x0 = Math.min(drag.x, x), y0 = Math.min(drag.y, y), x1 = Math.max(drag.x, x), y1 = Math.max(drag.y, y);
+      rb.hidden = false; rb.style.left = x0 / CUT.w * 100 + '%'; rb.style.top = y0 / CUT.h * 100 + '%'; rb.style.width = (x1 - x0) / CUT.w * 100 + '%'; rb.style.height = (y1 - y0) / CUT.h * 100 + '%';
+    });
+    document.addEventListener('pointerup', function (e) {
+      if (!drag) return; var r = drag.st.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * CUT.w, y = (e.clientY - r.top) / r.height * CUT.h, d = drag; drag = null;
+      var x0 = Math.max(0, Math.min(d.x, x)), y0 = Math.max(0, Math.min(d.y, y)), x1 = Math.min(CUT.w - 1, Math.max(d.x, x)), y1 = Math.min(CUT.h - 1, Math.max(d.y, y));
+      if (x1 - x0 < 8 || y1 - y0 < 8) { var rb = $('#cutrubber'); if (rb) rb.hidden = true; return; }
+      CUT.boxes.push({ id: ++cutIds, x0: Math.round(x0), y0: Math.round(y0), x1: Math.round(x1), y1: Math.round(y1), label: 0, name: '', keep: true, manual: true });
+      cutNameAll(); cutRender();
+    });
+  })();
 
   boot();
 })();

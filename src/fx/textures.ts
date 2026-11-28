@@ -70,7 +70,11 @@ function paintFront(c: HTMLCanvasElement, card: Card, img: HTMLImageElement | nu
   g.quadraticCurveTo(ax + 380, ay + ah - 210, ax + 520, ay + ah - 90);
   g.lineTo(ax + aw, ay + ah - 140); g.lineTo(ax + aw, ay + ah); g.fill();
   // monster
-  if (img) {                            // illustration fills the art panel (cover-fit, centred)
+  if (img && card.artFit === 'contain') {  // a cut-out sprite: shown whole, with room around it and a soft shadow
+    const k = Math.min(aw * 0.84 / img.width, ah * 0.84 / img.height), dw = img.width * k, dh = img.height * k;
+    g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 26; g.shadowOffsetY = 12;
+    g.drawImage(img, ax + (aw - dw) / 2, ay + (ah - dh) / 2, dw, dh); g.shadowBlur = 0; g.shadowOffsetY = 0;
+  } else if (img) {                     // illustration fills the art panel (cover-fit, centred)
     const k = Math.max(aw / img.width, ah / img.height), dw = img.width * k, dh = img.height * k;
     g.drawImage(img, ax + (aw - dw) / 2, ay + (ah - dh) / 2, dw, dh);
   } else {
@@ -136,15 +140,26 @@ export function cardBackTexture(rarity: Rarity): THREE.CanvasTexture {
   return tex(c);
 }
 
-export interface PackLook { name?: string; icon?: string; color?: string }
+export interface PackLook { name?: string; icon?: string; color?: string; image?: string }
 const hexRgb = (h: string) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
 const mixRgb = (a: number[], b: number[], t: number) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
 const rgba = (c: number[], a = 1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 
 /** The foil pack: the house crimson by default, or the colour, emoji and name of a custom pack. */
 export function packTexture(look: PackLook = {}): THREE.CanvasTexture {
-  const c = canvas(), g = c.getContext('2d')!;
-  const custom = !!(look.icon || look.color);
+  const c = canvas(); paintPack(c, look, null);
+  const t = tex(c);
+  if (look.image) {                      // the pack's own picture: repaint once it has loaded
+    const img = new Image(); img.crossOrigin = 'anonymous';
+    img.onload = () => { paintPack(c, look, img); t.needsUpdate = true; };
+    img.src = look.image;
+  }
+  return t;
+}
+
+function paintPack(c: HTMLCanvasElement, look: PackLook, img: HTMLImageElement | null) {
+  const g = c.getContext('2d')!; g.clearRect(0, 0, c.width, c.height);
+  const custom = !!(look.icon || look.color || look.image);
   const base = hexRgb(look.color && /^#[0-9a-f]{6}$/i.test(look.color) ? look.color : '#a3261c');
   const mid = custom ? mixRgb(base, [0, 0, 0], 0.32) : [110, 19, 15], low = custom ? mixRgb(base, [0, 0, 0], 0.64) : [58, 9, 8];
   const glow = custom ? mixRgb(base, [255, 190, 90], 0.6) : [255, 190, 90];
@@ -162,7 +177,10 @@ export function packTexture(look: PackLook = {}): THREE.CanvasTexture {
   g.fillStyle = rg; g.fillRect(0, 100, W, 760);
   g.textAlign = 'center'; g.textBaseline = 'middle';
   g.shadowColor = rgba(glow); g.shadowBlur = 40;
-  if (look.icon) { g.font = `300px ${EMOJI}`; g.fillText(look.icon, W / 2, 470); }
+  if (img) {                             // the picture sits where the emblem goes, shown whole
+    const k = Math.min(430 / img.width, 430 / img.height), dw = img.width * k, dh = img.height * k;
+    g.drawImage(img, W / 2 - dw / 2, 470 - dh / 2, dw, dh);
+  } else if (look.icon) { g.font = `300px ${EMOJI}`; g.fillText(look.icon, W / 2, 470); }
   else { g.font = `420px ${HANZI}`; g.fillStyle = gold; g.fillText('妖', W / 2, 480); }
   g.shadowBlur = 0;
   // title: the pack's name, shrunk to fit the pack
@@ -183,7 +201,6 @@ export function packTexture(look: PackLook = {}): THREE.CanvasTexture {
     g.beginPath(); g.moveTo(x, 6); g.lineTo(x, 94); g.stroke();
     g.beginPath(); g.moveTo(x, H - 94); g.lineTo(x, H - 6); g.stroke();
   }
-  return tex(c);
 }
 
 export function spriteTexture(): THREE.CanvasTexture {

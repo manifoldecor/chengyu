@@ -20,12 +20,12 @@ export const DEFAULT_CONFIG: GameConfig = {
 const RARITY_ALIASES: Record<string, Rarity> = {
   '普通': 'common', '常见': 'common', '优秀': 'uncommon', '少见': 'uncommon', '稀有': 'rare', '史诗': 'epic', '传说': 'legendary', '传奇': 'legendary',
 };
-const KEYS = new Set(['id', 'text', 'pinyin', 'meaning', 'rarity', 'monster', 'name', 'art', 'tags', 'price', 'exclusive']);
+const KEYS = new Set(['id', 'text', 'pinyin', 'meaning', 'rarity', 'monster', 'name', 'art', 'sprite', 'tags', 'price', 'exclusive']);
 const baseName = (path: string) => path.split('/').pop()!.replace(/\.[^.]+$/, '');
 const truthy = (v: string) => /^(yes|true|y|1|是)$/i.test(v.trim());
 
 /** Parse one card file: `key: value` lines, a blank line, then the (optional) story. */
-export function parseCardFile(path: string, raw: string, art: Record<string, string>): { card?: Card; problems: string[] } {
+export function parseCardFile(path: string, raw: string, art: Record<string, string>, sprites: Record<string, string> = {}): { card?: Card; problems: string[] } {
   const file = path.split('/').pop()!, problems: string[] = [];
   const warn = (m: string) => problems.push(`${file}: ${m}`);
   const lines = raw.replace(/^﻿/, '').split(/\r?\n/);
@@ -54,16 +54,23 @@ export function parseCardFile(path: string, raw: string, art: Record<string, str
   }
   const id = (fields.id || baseName(path)).trim();
 
-  // art: explicit `art: file.png`, otherwise any file in content/art named after the card id
-  let artUrl: string | undefined;
-  const artKeys = Object.keys(art);
+  // picture: an explicit `art: file.png` wins, then a `sprite: name` from the sprite library, then any file in content/art named after the card id
+  const artKeys = Object.keys(art), spriteKeys = Object.keys(sprites);
+  let explicit: string | undefined, spriteUrl: string | undefined, auto: string | undefined;
   if (fields.art) {
     const key = artKeys.find(k => k.split('/').pop()!.toLowerCase() === fields.art.toLowerCase());
-    if (key) artUrl = art[key]; else warn(`art file "${fields.art}" was not found in content/art (the emoji is used instead)`);
+    if (key) explicit = art[key]; else warn(`art file "${fields.art}" was not found in content/art (the emoji is used instead)`);
   } else {
     const key = artKeys.find(k => baseName(k).toLowerCase() === id.toLowerCase());
-    if (key) artUrl = art[key];
+    if (key) auto = art[key];
   }
+  const spriteName = fields.sprite?.trim();
+  if (spriteName) {
+    const key = spriteKeys.find(k => baseName(k).toLowerCase() === spriteName.toLowerCase());
+    if (key) spriteUrl = sprites[key]; else warn(`sprite "${spriteName}" was not found in content/sprites (the card's other picture, or its emoji, is used instead)`);
+  }
+  const artUrl = explicit ?? spriteUrl ?? auto;
+  const artFit = artUrl && explicit === undefined && artUrl === spriteUrl ? ('contain' as const) : undefined;
 
   let price: number | undefined;
   if (fields.price) {
@@ -74,7 +81,7 @@ export function parseCardFile(path: string, raw: string, art: Record<string, str
     id, text: fields.text, pinyin: fields.pinyin ?? '', meaning: fields.meaning ?? '', rarity,
     monster: fields.monster || '👾', name: fields.name || fields.text,
     tags: (fields.tags ?? '').split(/[,，、]/).map(t => t.trim().toLowerCase()).filter(Boolean),
-    ...(artUrl ? { art: artUrl } : {}), ...(story ? { story } : {}), ...(price ? { price } : {}),
+    ...(artUrl ? { art: artUrl } : {}), ...(artFit ? { artFit } : {}), ...(spriteName ? { sprite: spriteName } : {}), ...(story ? { story } : {}), ...(price ? { price } : {}),
     ...(fields.exclusive && truthy(fields.exclusive) ? { exclusive: true } : {}),
   };
   if (card.exclusive && !card.price) warn('"exclusive: yes" but no "price:", so nobody can ever get this card');
@@ -125,7 +132,7 @@ export function parseConfig(raw: unknown, problems: string[]): GameConfig {
     cfg.packs.push({
       id, name: typeof p.name === 'string' && p.name.trim() ? p.name.trim() : id, cost: num(p.cost, 0, `packs[${i}].cost`, problems), weights,
       ...(Array.isArray(p.tags) && p.tags.length ? { tags: (p.tags as unknown[]).map(t => String(t).toLowerCase()) } : {}),
-      ...(cards.length ? { cards } : {}), ...(icon ? { icon } : {}), ...(color ? { color } : {}), ...(description ? { description } : {}),
+      ...(cards.length ? { cards } : {}), ...(typeof p.sprite === 'string' && p.sprite.trim() ? { sprite: p.sprite.trim() } : {}), ...(icon ? { icon } : {}), ...(color ? { color } : {}), ...(description ? { description } : {}),
     });
   }
   if (!cfg.packs.length) { problems.push('game.json: no valid packs, using the built-in basic pack'); cfg.packs = DEFAULT_CONFIG.packs; }
@@ -137,13 +144,14 @@ export function parseConfig(raw: unknown, problems: string[]): GameConfig {
 }
 
 /** Turn the raw content files into validated game data. Never throws: problems are collected for display. */
-export function buildContent(cardFiles: Record<string, string>, artFiles: Record<string, string>, rawConfig: unknown): Content {
+/** `extras.sprites` = content/sprites (cut-out pictures to reuse), `extras.packImages` = content/packs (a picture per pack, named after its id). */
+export function buildContent(cardFiles: Record<string, string>, artFiles: Record<string, string>, rawConfig: unknown, extras: { sprites?: Record<string, string>; packImages?: Record<string, string> } = {}): Content {
   const problems: string[] = [];
   const config = parseConfig(rawConfig, problems);
   const cards: Card[] = [], seen = new Set<string>();
   for (const path of Object.keys(cardFiles).sort()) {
     if (baseName(path).startsWith('_')) continue;           // templates / notes
-    const r = parseCardFile(path, cardFiles[path], artFiles);
+    const r = parseCardFile(path, cardFiles[path], artFiles, extras.sprites ?? {});
     problems.push(...r.problems);
     if (!r.card) continue;
     if (seen.has(r.card.id)) { problems.push(`${path.split('/').pop()}: another card already uses the id "${r.card.id}" - skipped`); continue; }
@@ -161,6 +169,14 @@ export function buildContent(cardFiles: Record<string, string>, artFiles: Record
     for (const id of missing) problems.push(`game.json: pack "${p.id}" lists the card "${id}" which doesn't exist - skipped`);
     p.cards = p.cards.filter(id => known.has(id));
     if (!p.cards.length) delete p.cards;
+  }
+  const sprites = extras.sprites ?? {}, packImages = extras.packImages ?? {};
+  for (const p of config.packs) {                                    // a pack's picture: its sprite, or the file named after its id
+    const spriteKey = p.sprite ? Object.keys(sprites).find(k => baseName(k).toLowerCase() === p.sprite!.toLowerCase()) : undefined;
+    if (p.sprite && !spriteKey) problems.push(`game.json: pack "${p.id}" uses the sprite "${p.sprite}" which isn't in content/sprites`);
+    const own = Object.keys(packImages).find(k => baseName(k).toLowerCase() === p.id.toLowerCase());
+    const url = spriteKey ? sprites[spriteKey] : own ? packImages[own] : undefined;
+    if (url) p.image = url;
   }
   return { cards, config, problems };
 }
